@@ -1,0 +1,52 @@
+1.源代码：
+#include<iostream>                                         //方法一：复杂度较大，先利用算法排序，如果一定存在那么中间的一定是major,如果不一定存在，那么需要再次遍历判断是不是多数；
+#include<vector>                                           //方法二：就是利用摩尔投票法，‘删除不同的一对元素’，留下的可能是众数，然后通过一次遍历判断是不是众数；
+#include<algorithm>
+using namespace std;
+class Solution{
+public:                                                   //学会这种摩尔投票法的套路！！！非常的巧妙！！！
+	int majorityElement(vector<int> &nums){
+		int cnt=0;                                            //形象一点，这cnt其实代表了当前需要删除的元素个数（近似的也有标志的含义），即为0说明暂没有元素需要配对删除，如果为1，2，等则是对应剩余几个元素要删除；
+		int major=0;                
+		for(int i=0;i<nums.size();i++){
+			if(cnt==0){                                         //如果等于0，那么需要把当前遍历的元素赋给major
+				major=nums[i];
+				cnt++;
+			}else{
+				if(major==nums[i]){                               //如果出现了重复，那么cnt即需要配对删除的元素数要加1，但是major的值不用变，因为是一样的
+					cnt++;
+				}else{
+					cnt--;                                          //如果不等，那么就可以把cnt减一，即‘删除’了一对不同的元素
+				}
+			}
+		}
+		if(cnt>0){                                            //如果cnt=0,说明都删完了，肯定不存在众数，如果大于零，这个数可能是众数，也可能是漏网之鱼（元素有奇数个）
+			int count=0;                                        //接下来就是遍历下数组，看看这个留下的众数（或者叫众数们），到底是不是多于一半
+			for(int j=0;j<nums.size();j++){
+				if(major==nums[j]){
+					count++;
+				}
+			}
+			if(count>nums.size()/2){                            //nums.size()/2就可以了，不用再nums.size()-1了（为什么？考虑下）size就代表元素个数了，-1的目的是出现数组下标，防止数组越界！！！
+				return major;
+			}
+		}
+		return -1;
+	}
+};
+int main(){
+	vector<int> nums;                                      //如果起初定义了数组的长度，那么利用push_back元素时，是从最后一个元素末尾加的！！！前面的都是0，然后才是你加的元素！！！
+	for(int i=0;i<10;i++){
+		int elem;
+		cin>>elem;                                           //cin后面不能加endl；换行符！！！
+		nums.push_back(elem);
+	}
+	for(vector<int>::iterator it=nums.begin();it!=nums.end();it++){
+		cout<<*it<<" ";
+	}
+	cout<<endl;
+	Solution S;
+	int temp=S.majorityElement(nums);                       //还是不要忘记引用作为函数参数传递时！一定要有地址，平白无故的数等是没有地址的！要定义一个变量去接受它！然后再传参数！！！
+	cout<<temp<<endl;
+	return 0;
+}
