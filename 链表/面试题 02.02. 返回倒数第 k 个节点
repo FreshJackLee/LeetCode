@@ -1,0 +1,25 @@
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int kthToLast(ListNode* head, int k) {
+        ListNode* pre=head;
+        ListNode* cur=head;
+        int cnt=0;
+        while(cnt!=k){                   //这一部分目的是让pre前进K个节点！！！！注意大佬的手法while(k--)巧妙死了@@@@@
+            pre=pre->next;
+            cnt++;
+        }
+        while(pre!=nullptr){             //同步移动，直到pre到达空节点，即最后一个节点的下一个（末尾节点这个想法是错的！！！），此时cur恰巧到达倒数低K个元素
+            pre=pre->next;
+            cur=cur->next;
+        }
+        return cur->val;
+    }
+};
