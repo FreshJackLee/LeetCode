@@ -1,0 +1,41 @@
+简单的解法：
+class Solution {
+public:
+    ListNode* middleNode(ListNode* head) {
+        ListNode *ptr=head;
+        int cnt=0;
+        while(ptr!=nullptr){
+            ptr=ptr->next;
+            cnt++;
+        }
+        int i=0;                            //注意这里，不需要再做判断是否个数为奇数还是偶数，记住这种东西！！！
+        while(i<cnt/2){
+            head=head->next;
+            i++;
+        }
+        return head;
+    }
+};
+2.牛逼的快慢指针：                            //同时同起点移动，快指针到末端，慢指针必然位于中间（或者中间有俩的话偏右）！！！
+class Solution {
+public:
+    ListNode* middleNode(ListNode* head) {
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while (fast != NULL && fast->next != NULL) {        //第一个条件防止为空链表造成fast->next越界访问出错！！！
+            slow = slow->next;
+            fast = fast->next->next;                      //注意快指针的移动技巧！！！
+        }
+        return slow;
+    }
+};
+3.数组方法：                                               //仔细体会vector的巧妙用法！！！
+class Solution {
+public:
+    ListNode* middleNode(ListNode* head) {
+        vector<ListNode*> A = {head};                      //创建一个内容为指向链表的指针，并赋予初值
+        while (A.back()->next != NULL)                     //最后一个元素的指针域不为空，可以进入循环
+            A.push_back(A.back()->next);
+        return A[A.size() / 2];
+    }
+};
