@@ -1,0 +1,20 @@
+解法：
+class Solution {                              //边界问题要注意收藏的书签：https://blog.csdn.net/Lin_RD/article/details/105186081
+public:
+    int search(vector<int>& nums, int target) {
+        int len=nums.size();
+        int left=0;
+        int right=len-1;                     //注意left和right是索引值，从0到n-1
+        while(left<=right){                  //尽量不要用left<right有很多特殊的情况
+            int mid=left+(right-left)/2;
+            if(target>nums[mid]){
+                left=mid+1;                  //注意要 加1 （因为mid一定是要抛弃的，显然target已经判断过不等于这个索引的值了）
+            }else if(target<nums[mid]){
+                right=mid-1;                 //注意要 减一 （理由同上）
+            }else{
+                return mid;
+            }
+        }
+        return -1;
+    }
+};
