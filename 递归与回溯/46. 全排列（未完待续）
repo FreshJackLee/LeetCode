@@ -1,0 +1,22 @@
+class Solution {
+public:
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> matrix;
+        int k=0;                                               //k和m分别代表起始坐标和末尾坐标！！
+        int m=nums.size()-1;
+        perm(nums,k,m,matrix);
+        return matrix;
+    }
+    void perm(vector<int> &nums,int k,int m,vector<vector<int>> &matrix){
+        if(k==m){
+            matrix.push_back(nums);                           //注意这里，在这个函数里直接把nums插入到矩阵的末端，并且注意这个函数返回值是void，且要return
+            return;
+        }else{
+            for(int j=k;j<=m;j++){
+                swap(nums[k],nums[j]);                        //分别固定到第一个位置
+                perm(nums,k+1,m,matrix);
+                swap(nums[k],nums[j]);                       //这里很关键，要理解为哈要返回，因为每一次的枝节都是从最初始的状态开始的，如果没有回去则是最后一次返回的结果排列，肯定漏很多！！！
+            }
+        }                                                      //一定要仔细体会这个算法！！！！
+    }
+};
