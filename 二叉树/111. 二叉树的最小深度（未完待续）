@@ -1,0 +1,38 @@
+class Solution {
+public:
+    int minDepth(TreeNode* root) {
+        if(root==nullptr){                      //递归停止的条件
+            return 0;
+        }else if(root->left==nullptr){          //左节点空了
+            return minDepth(root->right)+1;
+        }else if(root->right==nullptr){
+            return minDepth(root->left)+1;
+        }else{
+            return min(minDepth(root->left),minDepth(root->right))+1;       //如果左右节点都还有子节点那么递归调用函数
+        }
+    }
+};
+
+
+class Solution {
+public:
+    int minDepth(TreeNode *root) {
+        if (root == nullptr) {
+            return 0;
+        }
+
+        if (root->left == nullptr && root->right == nullptr) {
+            return 1;
+        }
+
+        int min_depth = INT_MAX;
+        if (root->left != nullptr) {
+            min_depth = min(minDepth(root->left), min_depth);
+        }
+        if (root->right != nullptr) {
+            min_depth = min(minDepth(root->right), min_depth);
+        }
+
+        return min_depth + 1;
+    }
+};
