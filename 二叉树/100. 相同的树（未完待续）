@@ -1,0 +1,14 @@
+class Solution {                                                                       //可以叫递归或者深度优先搜索
+public:
+    bool isSameTree(TreeNode* p, TreeNode* q) {
+        if(p==nullptr&&q==nullptr){                                                    //（从递归的角度去理解）说明遍历完成了，所有相等的条件均满足了，肯定是相同的二叉树，返回true！！
+            return true;
+        }else if(p==nullptr||q==nullptr){                                              //注意不用写成（p为空且q不为空）OR (p不为空且q为空)，因为如果同时为空就走上面的条件了
+            return false;
+        }else if(p->val!=q->val){                                                      //值一旦不相同就返回false（不知道算不算剪枝？？？）
+            return false;
+        }else{
+            return isSameTree(p->left,q->left) && isSameTree(p->right,q->right);        //注意这种技巧同时返回两个递归函数！！！
+        }
+    }
+};                                                                                       //时间复杂度：O(min(m,n))，其中 m 和 n 分别是两个二叉树的节点数。
