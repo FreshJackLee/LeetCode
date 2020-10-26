@@ -1,0 +1,18 @@
+class Solution {                                //与100的相同二叉树类似，不过对比的不是每个节点相同的位置，而是两个子树左右相反的位置!!!
+public:
+    bool check(TreeNode *p, TreeNode *q) {      
+        if(p==nullptr&&q==nullptr){              /*
+            return true;
+        }else if(p==nullptr||q==nullptr){             这一部分的本质就是比较左右子树是否“相同”！！！    
+            return false;
+        }else if(p->val!=q->val){
+            return false;                       */
+        }else{
+            return check(p->left,q->right) && check(p->right,q->left);     //这句话是镜像的本质，左子树的右节点等于右子树的左节点，左子树的左节点等于右子树的右节点！！！注意是两个都满足！！
+        }
+    }
+
+    bool isSymmetric(TreeNode* root) {
+        return check(root, root);                                                       //注意是如何调用函数的！！！
+    }
+};
