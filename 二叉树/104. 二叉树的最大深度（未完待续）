@@ -1,0 +1,9 @@
+class Solution {                                                               //仔细体会怎么写的
+public:
+    int maxDepth(TreeNode* root) {
+        if (root == nullptr) {                                                 //一般情况下都有这种递归的终止条件！！！！
+            return 0;
+        }
+        return max(maxDepth(root->left), maxDepth(root->right)) + 1;            //没有定义一个变量记录深度，因为可以累加
+    }
+};
