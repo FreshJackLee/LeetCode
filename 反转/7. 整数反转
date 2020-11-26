@@ -1,0 +1,49 @@
+class Solution {                  //不考虑溢出自己想的原始暴力的想法
+public:
+    int reverse(int x) {
+        int cnt=1;
+        int i=x;
+        while(abs(i)>9){          //判断位数，方便加和，注意是abs(i)>9，不要忘记负数，即绝对值大于9十进制要乘以10
+            i=i/10;
+            cnt*=10;
+        }
+        int y=0;
+        int j=x;
+        while(j!=0){
+            y=y+(j%10)*cnt;      //诸位相加
+            j=j/10;
+            cnt=cnt/10;
+        }
+
+        return y;
+    }
+};                              //以上方法非常的笨拙，还要判断位数，其实不用！！！直接 rem=x%10 res=res*10+rem x/=10 然后循环条件为x ！= 0即可（不会忽略负数）
+class Solution {                //这个为应该使用的方法！！！但是这个题有溢出的问题，要解决！！！
+public:
+    int reverse(int x) {
+        int y=0;
+        while(x!=0){
+        	int rem=x%10;
+        	y=y*10+rem;
+        	x/=10;
+        }
+
+        return y;
+    }
+};
+class Solution {                //官方完整的做法@@
+public:
+    int reverse(int x) {
+        int rev = 0;
+        while (x != 0) {
+            int pop = x % 10;
+            x /= 10;
+            if (rev > INT_MAX/10 || (rev == INT_MAX / 10 && pop > 7)) return 0;     //这里先不加和，先判断溢出，如果能判断溢出则直接返回0，
+                                                                                    //思路是由下往上，让最大值先降低和未进位的值比较，如果已经大于了，那么一定是溢出了不用再加了    
+            if (rev < INT_MIN/10 || (rev == INT_MIN / 10 && pop < -8)) return 0;    //但是有个例外，万一相等了，不一定溢出，只有要加的余数大于7（正数），或者小于-8（负数）
+                                                                                    //这个可以琢磨下为啥，当和INT_MAX/10比较，如果相等只需考虑最后一位，而最后以为INT_MAX是7
+            rev = rev * 10 + pop;                                                   //因此大于7一定溢出，负数的INT_MAX最后一位是-8，因此小于-8也溢出
+        }
+        return rev;
+    }
+};
