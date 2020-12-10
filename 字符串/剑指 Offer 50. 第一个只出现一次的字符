@@ -1,0 +1,29 @@
+1.别人的代码：基于map
+class Solution {
+public:
+    char firstUniqChar(string s) {
+        unordered_map<char, bool> dic;               //char即Key存储每个位置上的字符,bool统计是否为只出现一次的字符，ture即出现一次，false即出现大于一次
+        for(char c : s)                              //C++11范围for语句，遍历字符串上的每个字符
+            dic[c] = dic.find(c) == dic.end();       //注意优先级，=的优先级最低，dic.find(c)返回value的迭代器，没找到返回dic.end();即如果没有则为真，然后填入map--(f,true)
+        for(char c : s)                              //如果为假，那么说明找到了，有重复的字符，填入map--（c,false），即做到了如果有重复则value为false，否则唯一为true!!!
+            if(dic[c]) return c;                     //找到第一个为真的元素，即找到了第一个不重复字符
+        return ' ';                                  //否则，全部为重复或者为特殊情况返回空格
+    }
+};
+2.优化后的代码：
+class Solution {                                    //主要优化在第二次的遍历中，不需要再次把整个字符串遍历，我们构造一个vector把未重复的字符放入，只需按需找到第一个
+public:                                             //不重复的即可，
+    char firstUniqChar(string s) {
+        vector<char> keys;
+        unordered_map<char, bool> dic;
+        for(char c : s) {
+            if(dic.find(c) == dic.end())            //判断是否重复存在，如果没找到则唯一，那么推入vector中，注意并不能保证第一个推入的元素即是满足题意的！因为第一次出现也能推入，但
+                keys.push_back(c);                  //不能保证唯一
+            dic[c] = dic.find(c) == dic.end();      //注意不要写到if语句里面，两个数据结构是相互独立的，dic的功能是完整记录所有的key是否唯一，vector是保证记录所有的不重复字符减少二次遍历
+        }
+        for(char c : keys) {
+            if(dic[c]) return c;
+        }
+        return ' ';
+    }
+};
