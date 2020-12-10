@@ -1,0 +1,81 @@
+1.自己的解法：
+class Solution {                              //总体思路，利用栈的特点，反转就是先入栈，然后依次出栈保存即可，注意技巧
+public:
+    string reverseWords(string s) {
+        int n=s.size();
+        string s1;
+        stack<string> ss;
+        for(int i=0;i<n;++i){
+            while(i<n&&s[i]==' '){            //首位肯定不能是空格，所以排除空格
+                ++i;
+            }
+            while(i<n&&s[i]!=' '){            //满足条件的依次填入s1中
+                s1.push_back(s[i]);
+                ++i;
+            }
+            if(!s1.empty()){                  //注意这里要判断非空条件，否则末尾出现多个空格会造成第一个单词前多一个空格
+                ss.push(s1+=' ');             //注意这里是如何只提取一个空格！！！！！！
+            }
+            s1.clear();                      //写在if外面，因为每次都要清空
+        }
+        while(!ss.empty()){
+            s1.append(ss.top());
+            ss.pop();
+        }
+        s1.pop_back();                       //弹出最后一个不要的空格
+        return s1;
+    }
+};
+2.利用双指针：
+class Solution {
+public:
+    string reverseWords(string s) {
+        string res;
+        int n=s.size();
+        for(int i=n-1;i>=0;--i){                     //i用来从右往左遍历
+            int j=i;                                 //j用来作为右边界
+            while(j>=0&&s[j]==' '){                  //同时移动双指针到非空格的字符，注意出现【】一定要检查越界行为
+                --j;
+                --i;
+            }
+            while(i-1>=0&&s[i-1]!=' '){              //发现非空格字符左指针i前移，注意技巧用i-1，或者在k中用k+1!!!
+                --i;
+            }
+            if(i!=-1){                               //一定要检查i是否遍历完成，否则会有越界行为，或者不检查的话，k=i+1，这会多出来一个空格
+                for(int k=i;k<=j;++k){
+                    res.push_back(s[k]);
+                }
+                res.push_back(' ');
+            }
+        }
+        res.pop_back();
+        return res;
+    }
+};
+双指针二：
+class Solution {
+public:
+    string reverseWords(string s) {
+        string res;
+        int n=s.size();
+        for(int i=n-1;i>=0;--i){
+            int j=i;
+            while(j>=0&&s[j]==' '){
+                --j;
+                --i;
+            }
+            while(i>=0&&s[i]!=' '){
+                --i;
+            }
+            for(int k=i+1;k<=j;++k){
+                res.push_back(s[k]);
+            }
+            if(j!=-1){                 //其实和第二种方法一样，不过有区别的是k和i
+                res.push_back(' ');
+            }
+
+        }
+        res.pop_back();
+        return res;
+    }
+};
