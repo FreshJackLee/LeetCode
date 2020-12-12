@@ -1,0 +1,115 @@
+官方状态机模型代码：
+class Solution {
+public:
+    enum State {                         //注意枚举类型的用法，理解为默认从0排序的宏定义标识符（暂时这么理解）  以下分别是10个不同的状态过程，从起始到末尾
+        STATE_INITIAL,                   //起始状态        状态0
+        STATE_INT_SIGN,                  //符号即+或者-    状态1
+        STATE_INTEGER,                   //整数            状态2
+        STATE_POINT,                     //小数点          状态3
+        STATE_POINT_WITHOUT_INT,         //前无整数小数点   状态4
+        STATE_FRACTION,                  //小数部分        状态5
+        STATE_EXP,                       //指数符号        状态6
+        STATE_EXP_SIGN,                  //指数的符号      状态7
+        STATE_EXP_NUMBER,                //指数的数字      状态8
+        STATE_END,                       //结尾状态        状态9
+    };
+
+    enum CharType {                      //为了减少状态的复杂程度（例如数字0-9均表示可表示一个状态），所以用统一的符号来表示一个状态，结合下面的charType转化函数来理解
+        CHAR_NUMBER,
+        CHAR_EXP,
+        CHAR_POINT,
+        CHAR_SIGN,
+        CHAR_SPACE,
+        CHAR_ILLEGAL,
+    };
+
+    CharType toCharType(char ch) {               //减少状态表示的函数！！！
+        if (ch >= '0' && ch <= '9') {            //数字0-9同意转化为--0
+            return CHAR_NUMBER;
+        } else if (ch == 'e' || ch == 'E') {     //指数符号e和E为--1
+            return CHAR_EXP;
+        } else if (ch == '.') {                  //小数点表示为--2
+            return CHAR_POINT;
+        } else if (ch == '+' || ch == '-') {     //正负符号转化为--3
+            return CHAR_SIGN;
+        } else if (ch == ' ') {                  //空格转化为--4
+            return CHAR_SPACE;
+        } else {                                 //其他的符号则为不合格的符号--5
+            return CHAR_ILLEGAL;
+        }
+    }
+
+    bool isNumber(string s) {
+        unordered_map<State, unordered_map<CharType, State>> transfer{       //使用未排序的map（底层为哈希表）的存储状态位图，即按照状态位图的翻译过程
+            {
+                STATE_INITIAL, {
+                    {CHAR_SPACE, STATE_INITIAL},
+                    {CHAR_NUMBER, STATE_INTEGER},
+                    {CHAR_POINT, STATE_POINT_WITHOUT_INT},
+                    {CHAR_SIGN, STATE_INT_SIGN},
+                }
+            }, {
+                STATE_INT_SIGN, {
+                    {CHAR_NUMBER, STATE_INTEGER},
+                    {CHAR_POINT, STATE_POINT_WITHOUT_INT},
+                }
+            }, {
+                STATE_INTEGER, {
+                    {CHAR_NUMBER, STATE_INTEGER},
+                    {CHAR_EXP, STATE_EXP},
+                    {CHAR_POINT, STATE_POINT},
+                    {CHAR_SPACE, STATE_END},
+                }
+            }, {
+                STATE_POINT, {
+                    {CHAR_NUMBER, STATE_FRACTION},
+                    {CHAR_EXP, STATE_EXP},
+                    {CHAR_SPACE, STATE_END},
+                }
+            }, {
+                STATE_POINT_WITHOUT_INT, {
+                    {CHAR_NUMBER, STATE_FRACTION},
+                }
+            }, {
+                STATE_FRACTION,
+                {
+                    {CHAR_NUMBER, STATE_FRACTION},
+                    {CHAR_EXP, STATE_EXP},
+                    {CHAR_SPACE, STATE_END},
+                }
+            }, {
+                STATE_EXP,
+                {
+                    {CHAR_NUMBER, STATE_EXP_NUMBER},
+                    {CHAR_SIGN, STATE_EXP_SIGN},
+                }
+            }, {
+                STATE_EXP_SIGN, {
+                    {CHAR_NUMBER, STATE_EXP_NUMBER},
+                }
+            }, {
+                STATE_EXP_NUMBER, {
+                    {CHAR_NUMBER, STATE_EXP_NUMBER},
+                    {CHAR_SPACE, STATE_END},
+                }
+            }, {
+                STATE_END, {
+                    {CHAR_SPACE, STATE_END},
+                }
+            }
+        };
+
+        int len = s.length();
+        State st = STATE_INITIAL;
+
+        for (int i = 0; i < len; i++) {                             //遍历字符串开始进行状态转移与判断
+            CharType typ = toCharType(s[i]);                        //首先“翻译”字符到状态的字符
+            if (transfer[st].find(typ) == transfer[st].end()) {     //如果在哈希表没有找到了对应的状态符，则状态不能进行转移，直接返回失败
+                return false;
+            } else {
+                st = transfer[st][typ];                             //如果可以的找到，则可以进行状态转移
+            }
+        }
+        return st == STATE_INTEGER || st == STATE_POINT || st == STATE_FRACTION || st == STATE_EXP_NUMBER || st == STATE_END;  //最后对st状态进行判断，满足状态位图即返回true！！
+    }
+};
