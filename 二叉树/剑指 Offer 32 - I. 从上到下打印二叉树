@@ -1,0 +1,23 @@
+1.自己的代码！！！：
+class Solution {
+public:
+    vector<int> levelOrder(TreeNode* root) {            //注意体会，队列的先入先出规则
+        vector<int> v;
+        if(root==nullptr){
+            return v;
+        }
+        queue<TreeNode*> q;                           //错误点：尖括号里面不能写成TreeNode *root！！因为要写的是数据结构不是具体的对象!!!
+        q.push(root);
+        while(!q.empty()){                            //错误点：不能写成！=q.empty();注意区分
+            v.push_back(q.front()->val);
+            if(q.front()->left!=nullptr){
+                q.push(q.front()->left);
+            }
+            if(q.front()->right!=nullptr){
+                q.push(q.front()->right);
+            }
+            q.pop();                                //不要忘记出队列的操作@!!!!
+        }
+        return v;
+    }
+};
