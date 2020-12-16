@@ -1,0 +1,21 @@
+别人的代码：
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {                //输入两个非重复节点的树，一个先序遍历，一个中序遍历，重构这颗二叉树
+        this->preorder = preorder;                                                    //因为是引用传参，所以类的内部先定义一个先序遍历的数组
+        for(int i = 0; i < inorder.size(); i++)                                       //利用字典，键为中序遍历的节点的值域，值为下标i，目的是当找到根节点，需要在中序遍历找到这个根节点，来划分子问题
+            dic[inorder[i]] = i;                     哈希查找
+        return recur(0, 0, inorder.size() - 1);                                       //递归回调
+    }
+private:
+    vector<int> preorder;
+    unordered_map<int, int> dic;
+    TreeNode* recur(int root, int left, int right) {                                 //对每一个子问题进行分治
+        if(left > right) return nullptr;                        // 递归终止            Left和right的下标
+        TreeNode* node = new TreeNode(preorder[root]);          // 建立根节点
+        int i = dic[preorder[root]];                哈希调用            // 划分根节点、左子树、右子树，即重构的步骤--先在先序遍历中找到根节点preorder[root]，然后再找到这个根节点所在中序遍历的位置
+        node->left = recur(root + 1, left, i - 1);              // 开启左子树递归
+        node->right = recur(root + i - left + 1, i + 1, right); // 开启右子树递归
+        return node;                                            // 回溯返回根节点
+    }
+};
