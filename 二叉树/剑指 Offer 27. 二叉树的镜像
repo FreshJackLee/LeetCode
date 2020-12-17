@@ -1,0 +1,32 @@
+1.别人的方法：递归：
+class Solution {
+public:
+    TreeNode* mirrorTree(TreeNode* root) {
+        if (root == NULL)   return NULL;             //如果根节点为空则返回空节点                                                     递归终止条件
+        mirrorTree(root->left);                      //注意子问题也是镜像子树的结构，所以直接调用本身，实参分别为左右节点                 左子树递归
+        mirrorTree(root->right);                                                                                                    右子树递归
+        swap(root->left, root->right);               //实际的步骤交换左右节点
+        return root;        
+    }
+};
+2.迭代：
+class Solution {
+public:
+    TreeNode* mirrorTree(TreeNode* root) {
+        stack<TreeNode*> s;                                //利用栈先入后出的特点来实现镜像二叉树的迭代算法
+        s.push(root);                                      //根节点先入栈
+        
+        while(!s.empty())                                  //当栈不为空时，进行循环
+        {
+            TreeNode *p = s.top();      //保存子树的根节点
+            s.pop();
+            if(p)
+            {
+                if(p->left  != NULL) s.push(p->left);
+                if(p->right != NULL) s.push(p->right);
+                swap(p->left,p->right);
+            }
+        }
+        return root;
+    }
+};
