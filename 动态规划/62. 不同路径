@@ -1,0 +1,19 @@
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        vector<vector<int>> f(m,vector<int>(n));        //注意看是如何开二维数组的，同时要注意不用开m+1和n+1因为自己想去吧
+        f[0][0]=1;                                      //初始条件，本身位置就是一种走法
+        int i,j;                                        //注意要定义在外面，因为如果定义在for循环里面要把f[i][j]的值赋给一个全局变量，不然i，j离开作用域f[i][j]就没有了
+        for(i=0;i<m;++i){
+            for(j=0;j<n;++j){
+                if(i==0||j==0){                         //注意边界条件，同时也防止数组下标越界的问题
+                    f[i][j]=1;
+                }else{
+                    f[i][j]=f[i-1][j]+f[i][j-1];
+                }
+            }
+        }
+
+        return f[i-1][j-1];                              //注意要返回的是f[i-1][j-1]（真正的右下角），而不是f[i][j]，因为开的是m和n这样是越界的！！！
+    }
+};
