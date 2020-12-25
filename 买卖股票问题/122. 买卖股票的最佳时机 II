@@ -1,0 +1,50 @@
+1.贪心法：自己的理解：利润的最小单位来源于今天和昨天价格的差值，只要今天比昨天高，那么就一定有利润，所以我把所有的利润来源全部拿到手里，那么自然就可以贪心出利润的最大值，贪心可行
+自己的贪心算法：
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int n=prices.size();
+        int max_profit=0;
+        int current_profit=0;
+        for(int i=1;i<n;++i){
+            current_profit=prices[i]-prices[i-1];
+            if(current_profit>0){                             //只有有利润
+                max_profit=max_profit+current_profit;         //就进行贪心策略
+            }
+        }
+        if(max_profit<0){
+            max_profit=0;
+        }
+        return max_profit;
+    }
+};
+2.动态规划：                                                    //两种状态：dp[i][0]-当天没有股票的最大利润，dp[i][1]-当天持有股票的最大利润
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int n = prices.size();
+        int dp[n][2];
+        dp[0][0] = 0, dp[0][1] = -prices[0];                  //初始化状态，第一天没有持有股票利润为0，如果持有股票利润就是你买股票的价格!!!
+        for (int i = 1; i < n; ++i) {                           //为什么要两个表达式呢，因为第一个表达式要第二个表达式的结果才能算出来
+            dp[i][0] = max(dp[i - 1][0], dp[i - 1][1] + prices[i]);      //如果没有股票，利润就是前一天没有股票的最大利润和前一天有股票但是今天要卖出所以加上今天的价格!!!
+            dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] - prices[i]);      //如果持有股票，利润就是前一天持有股票的最大利润和前一天没有股票但是今天必须要买股票，所以利润要减去今天的股票价格！
+        }
+        return dp[n - 1][0];                                            //返回值容易理解，肯定是股票全卖出后的利润最大
+    }
+};
+3.优化后的动态规划：
+class Solution {                                               //注意到上面的状态转移方程中，每一天的状态只与前一天的状态有关，而与更早的状态都无关，因此我们不必存储这些无关的状态，
+                                                               //只需要将存放在两个变量中，通过它们计算出 并存回对应的变量，以便于第i+1 天的状态转移即可。
+public:
+    int maxProfit(vector<int>& prices) {
+        int n = prices.size();
+        int dp0 = 0, dp1 = -prices[0];
+        for (int i = 1; i < n; ++i) {
+            int newDp0 = max(dp0, dp1 + prices[i]);
+            int newDp1 = max(dp1, dp0 - prices[i]);
+            dp0 = newDp0;
+            dp1 = newDp1;
+        }
+        return dp0;
+    }
+};
