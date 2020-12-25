@@ -1,0 +1,34 @@
+动态规划求解：
+class Solution {
+public:
+    int maxProfit(vector<int>& prices, int fee) {
+        int n=prices.size();
+        int dp[n][2];
+        dp[0][0]=0;
+        dp[0][1]=-prices[0];
+        for(int i=1;i<n;++i){
+            dp[i][0]=max(dp[i-1][0],dp[i-1][1]+prices[i]-fee);          //与不含手续费的唯一区别，就是一旦你要卖出去就减一下手续费其他思路是一样的
+            dp[i][1]=max(dp[i-1][1],dp[i-1][0]-prices[i]);
+        }
+        return dp[n-1][0];
+    }
+};
+2.贪心算法：
+class Solution {
+public:
+    int maxProfit(vector<int>& prices, int fee) {      //核心是买入加手续费，第一次卖出时候，开始有反悔操作，如果涨就当作不收手续费然后赚了差价，如果跌，那么一定亏钱，不卖累加后得到最值
+        int n = prices.size();
+        int buy = prices[0] + fee;                   //当我们买入股票的时候，其实意味着我们要买的实际价格是股票价格加上卖出时候要出的手续费
+        int profit = 0;
+        for (int i = 1; i < n; ++i) {
+            if (prices[i] + fee < buy) {             //如果接下来实际价格（实际花费）小于买价格，我后悔了，因为我买贵了，我选择用当前的低价格重新买入这个股票
+                buy = prices[i] + fee;               //更新买价
+            }                                        //如果发现没有买贵，那么看一下是否可赚钱（因为存在手续费）
+            else if (prices[i] > buy) {             //如果股票账面价（没有手续费）格大于实际买价（因为手续费在买入的时候已经算过了），即实际收益=卖出-买入-手续费代表，可以赚钱那么就买
+                profit += prices[i] - buy;          //因为可以赚钱了，我就买！！！
+                buy = prices[i];                    //这个是核心代码，如果股票继续上升，但是我提前卖了，我亏了，但是我要反悔，如何反悔？如果跌了呢？
+            }                                       //我可以这样操作，我不给你手续费但是我假定买了今天这个股票，如果明天还涨，我发现我可以赚钱，把所得利润再拿回来，如果跌了进不来这个循环
+        }
+        return profit;
+    }
+};
