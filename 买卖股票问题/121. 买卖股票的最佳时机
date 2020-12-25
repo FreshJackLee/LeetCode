@@ -1,0 +1,35 @@
+暴力解法：
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int max_profit=INT_MIN;
+        int current_profit=0;
+        int n=prices.size();
+        for(int i=0;i<n;++i){                              //俩循环，挨个遍历，如果利润大那么就更新最大利润
+            for(int j=i+1;j<n;++j){
+                current_profit=prices[j]-prices[i];
+                max_profit=max(max_profit,current_profit);
+            }
+        }
+        if(max_profit<0){                                 //注意条件是小于0，因为循环一定会进入，从而替代INT_MIN；
+            max_profit=0;
+        }
+        return max_profit;
+    }
+};
+2.一次遍历：
+class Solution {                                         //每天就想：如果我这个股票以前是最低价格卖的就好了，我今天就可以获得最大利润了，然后往后面推，可以反悔那种动态更新最大利润
+public:
+    int maxProfit(vector<int>& prices) {
+        int min_price=INT_MAX;                           //初始化最小值为最大
+        int max_profit=INT_MIN;                          //初始化最大值为最小
+        for(auto e:prices){                              //核心思想是如果当前的股票是我历史最低买的就好了！！！注意是历史最低，也就是当下标为i时，[0，i-1]的最小值，不是全局最小值！！
+            max_profit=max(max_profit,e-min_price);      //如果利润出现最大，那么就更新最大利润
+            min_price=min(min_price,e);                  //如果当前下标的元素最小那么也更新，注意顺序不能和上个表达式换！！！
+        }
+        if(max_profit<0){
+            max_profit=0;
+        }
+        return max_profit;
+    }
+};
