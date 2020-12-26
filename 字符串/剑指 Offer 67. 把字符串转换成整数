@@ -1,0 +1,33 @@
+class Solution {                          //这种方法适合环境高于题目的INT_MAX
+public:
+    int strToInt(string str) {
+        int i = 0, flag = 1;
+        long res = 0; //默认flag = 1，正数
+        while (str[i] == ' ') i ++;                             //如果出现空格，就一直往前
+        if (str[i] == '-') flag = -1;                           //如果出现负号标志变为负数
+        if (str[i] == '-' || str[i] == '+') i ++;               //如果接下来出现正负号前进一步
+        for (; i < str.size(); i++)  {                          //遍历接下来的字符串
+            if(str[i]<'0'||str[i]>'9') break;                   //如果不在数字范围内就跳出循环
+            res = res * 10 + (str[i] - '0');                    //结果就等于进位后加上与零字符的差值,一串数字字符转数字的公式：res=res*10+(e-'0')
+            if (res >= INT_MAX && flag == 1) return  INT_MAX;   //如果结果大于等于INT_MAX，且是个正数（没有出现负号）就返回INT_MAX，否则返回INT_MIN
+            if (res > INT_MAX && flag == -1) return  INT_MIN;
+        } 
+        return flag * res;                                      //注意结果是flag*res;
+    }
+};
+class Solution {                              //实际应该的代码
+public:
+    int strToInt(string str) {
+        int i = 0, flag = 1;
+        int res = 0; //默认flag = 1，正数
+        while (str[i] == ' ') i ++;
+        if (str[i] == '-') flag = -1;
+        if (str[i] == '-' || str[i] == '+') i ++;
+        for (; i < str.size() && isdigit(str[i]); i ++)  {
+            if (res > INT_MAX / 10 || (res == INT_MAX / 10 && str[i] - '0' > 7)) //溢出判定，再可能溢出前进行溢出判定，如果大于INT_MAX/10，一定溢出，或者等于INT_MAX/10,且余数大于7
+                  return flag == 1 ? INT_MAX : INT_MIN;
+            res = res * 10 + (str[i] - '0');
+        } 
+        return flag * res;
+    }
+};
