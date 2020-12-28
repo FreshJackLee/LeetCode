@@ -1,0 +1,125 @@
+暴力匹配：利用库函数
+class Solution {
+public:
+    int strStr(string haystack, string needle) {
+        int len1=haystack.size();
+        int len2=needle.size();
+        int res=-1;
+        if(needle.empty()){
+            return 0;
+        }
+        for(int i=0;i<len1;++i){
+            if(!haystack.substr(i,len2).compare(needle)){       如果相同就返回
+                res=i;
+                break;
+            }
+        }
+        return res;
+    }
+};
+也是暴力匹配，不过不用库函数
+class Solution {
+public:
+    int strStr(string haystack, string needle) {
+        if(needle.empty()){
+            return 0;
+        }
+        int res=-1;
+        int len1=haystack.size();
+        int len2=needle.size();
+        int i=0,j=0;
+        for(i=0;i<len1-len2+1;++i){
+            while(haystack[i]==needle[j]&&j<len2&&i<len1){
+                ++j;
+                ++i;
+            }
+            if(j==len2){
+                res=i-j;
+                break;
+            }else{
+                i=i-j;
+                j=0;
+            }
+        }
+        return res;
+    }
+};
+3.KMP算法：（一定要理解）
+class Solution {
+public:
+    void getNext(string &needle,vector<int> &next){
+        int len2=needle.size();
+        int k=-1;                                  //如果从-1开始，那么next[i]代表i位置字串的最长公共前后缀，并且作为下标要+1再开始，如果从0开始则代表包含自己本身的最长公共前后缀长度！！
+        for(int i=1;i<len2;++i){
+            while(k>=0&&needle[i]!=needle[k+1]){
+                k=next[k];
+            }
+            if(needle[i]==needle[k+1]){
+                k++;
+            }
+            next[i]=k;
+        }
+    }
+    int strStr(string haystack, string needle) {
+        if(needle.empty()){
+            return 0;
+        }
+        int len1=haystack.size();
+        int len2=needle.size();
+        vector<int> next(len2,-1);
+        getNext(needle,next);
+        int j=-1;
+        int res=-1;
+        for(int i=0;i<len1;++i){
+            while(j>=0&&haystack[i]!=needle[j+1]){
+                j=next[j];
+            }
+            if(haystack[i]==needle[j+1]){
+                j++;
+            }
+            if(j==len2-1){
+                res=i-len2+1;
+                break;
+            }
+        }
+
+        return res;
+    }
+};
+别人的KMP:
+class Solution {
+public:
+    void getNext(int* next, const string& s) {
+        int j = -1;
+        next[0] = j;
+        for(int i = 1; i < s.size(); i++) { // 注意i从1开始
+            while (j >= 0 && s[i] != s[j + 1]) { // 前后缀不相同了
+                j = next[j]; // 向前回溯
+            }
+            if (s[i] == s[j + 1]) { // 找到相同的前后缀
+                j++;
+            }
+            next[i] = j; // 将j（前缀的长度）赋给next[i]
+        }
+    }
+    int strStr(string haystack, string needle) {
+        if (needle.size() == 0) {
+            return 0;
+        }
+        int next[needle.size()];
+        getNext(next, needle);
+        int j = -1; // // 因为next数组里记录的起始位置为-1
+        for (int i = 0; i < haystack.size(); i++) { // 注意i就从0开始
+            while(j >= 0 && haystack[i] != needle[j + 1]) { // 不匹配
+                j = next[j]; // j 寻找之前匹配的位置
+            }
+            if (haystack[i] == needle[j + 1]) { // 匹配，j和i同时向后移动
+                j++; // i的增加在for循环里
+            }
+            if (j == (needle.size() - 1) ) { // 文本串s里出现了模式串t
+                return (i - needle.size() + 1);
+            }
+        }
+        return -1;
+    }
+};
