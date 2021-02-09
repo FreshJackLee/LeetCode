@@ -1,4 +1,4 @@
-class Solution {
+class Solution {                                                                    //这个方法有点复杂了，看看就行了，关键是新优化的代码要理解
 public:
     vector<vector<int>> permute(vector<int>& nums) {
         vector<vector<int>> matrix;
@@ -20,3 +20,29 @@ public:
         }                                                      //一定要仔细体会这个算法！！！！
     }
 };
+新优化的解法：
+class Solution {
+public:
+    vector<string> permutation(string s) {
+        int m=s.size();
+        set<string> ss;                                         //利用set的特性来去除结果的重复（结果重复来源于每个元素并不是完全不同的，可能有相同的值，所以会出现重复）
+        vector<string> vs;
+        perm(s,0,ss);
+        for(auto e:ss){                                         //巧用C++11的范围for语句，极大简化代码
+            vs.push_back(e);
+        }
+        return vs;
+    }
+    void perm(string s,int k,set<string>& ss){
+        if(k==s.size()){
+            ss.insert(s);
+        }else{
+            for(int i=k;i<s.size();++i){
+                swap(s[i],s[k]);
+                perm(s,k+1,ss);
+                swap(s[i],s[k]);
+            }
+        }
+    }
+};
+还有搜索剪枝的方法，暂时没有理解完全，以后有机会再说吧
