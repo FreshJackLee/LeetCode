@@ -1,0 +1,38 @@
+最基础的递归求法：但是太复杂不要用
+class Solution {
+public:
+    int fib(int n) {
+        if(n==0){
+            return 0;
+        }else if(n==1){
+            return 1;
+        }
+        return (fib(n-1)+fib(n-2))%1000000007;
+    }
+};
+2.递归一般都用递推来求解：
+class Solution {
+public:
+      int fib(int n) {
+        int a = 0, b = 1, sum;
+        for(int i = 0; i < n; i++){                             //利用递归从小到大开始计算！！
+            sum = (a + b) % 1000000007;
+            a = b;
+            b = sum;
+        }
+        return a;
+  }
+}
+或者这样：
+class Solution {
+public：
+    int fib(int n) {
+    vector<int> fib(101,0);                               //错误点1：第一个是个数，错误点2：要101个才能满足n=100不会出错，因为下标从0开始！！！！
+    fib[0]=0;
+    fib[1]=1
+    for(int i = 2; i <=n; i++){                             //主要i从2开始，第一符合逻辑，因为0和1已经定义过，第二防止下标越界!!!!
+        fib[i] = (fib[i-1] + fib[i-2]) % 1000000007;
+    }
+    return fib[n];                                     //这里不能返回fib[i]，因为i不在这个命名空间里，或者离开了作用域，所以要返回fib[n]！！！！！
+    }
+}
