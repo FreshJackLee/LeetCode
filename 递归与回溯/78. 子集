@@ -1,0 +1,21 @@
+class Solution {
+public:
+    vector<int> t;
+    vector<vector<int>> ans;
+
+    void dfs(int cur, vector<int>& nums) {                    //递归停止条件：当前坐标到末尾，把t送到二维数组里
+        if (cur == nums.size()) {
+            ans.push_back(t);
+            return;
+        }
+        t.push_back(nums[cur]);                              //否则：把当前元素送到一维数组里
+        dfs(cur + 1, nums);                                  //然后下标右移一位，计算子集的子集问题
+        t.pop_back();                                        //子集的子集计算完毕要记得回溯重置条件
+        dfs(cur + 1, nums);                                  //再计算（这里不是很理解）可以想一想回溯完成肯定要换一条路走嘛所以要继续进行深度搜索！！！
+    }
+
+    vector<vector<int>> subsets(vector<int>& nums) {
+        dfs(0, nums);
+        return ans;
+    }
+};
