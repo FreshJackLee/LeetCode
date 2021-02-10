@@ -1,0 +1,36 @@
+官方解法：
+class Solution {
+public:
+    vector<string> letterCombinations(string digits) {
+        vector<string> combinations;
+        if (digits.empty()) {
+            return combinations;
+        }
+        unordered_map<char, string> phoneMap{                                       //利用乱序容器（底层为hash）存储键值对
+            {'2', "abc"},
+            {'3', "def"},
+            {'4', "ghi"},
+            {'5', "jkl"},
+            {'6', "mno"},
+            {'7', "pqrs"},
+            {'8', "tuv"},
+            {'9', "wxyz"}
+        };
+        string combination;                                                           //用来做返回结果中vector<string>的string变量
+        backtrack(combinations, phoneMap, digits, 0, combination);                    //核心回溯函数，大部分的递归函数结构都是相似的，注意体会思想！！！
+        return combinations;
+    }
+
+    void backtrack(vector<string>& combinations, const unordered_map<char, string>& phoneMap, const string& digits, int index, string& combination) {
+        if (index == digits.length()) {                                           //如果下标解析到头，递归终止！！把字符串推入vector中
+            combinations.push_back(combination);
+        } else {                                                                  //否则：下面是核心要理解的代码@@@
+            const string& letters = phoneMap.at(digits[index]);                   //然后根据字典找出对应的value字符串
+            for (const char& letter: letters) {                                   //对于每个数字代表的字符串的每个字符进行遍历
+                combination.push_back(letter);                                    //value的每个字符先入栈（标记访问）
+                backtrack(combinations, phoneMap, digits, index + 1, combination);    //对以后的子问题重复递归
+                combination.pop_back();                                               //记得要回溯节点，点访问过了要出栈，返回到上一个节点
+            }
+        }
+    }
+};
