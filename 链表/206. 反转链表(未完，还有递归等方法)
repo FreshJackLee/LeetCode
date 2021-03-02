@@ -6,7 +6,7 @@
  *     ListNode(int x) : val(x), next(NULL) {}
  * };
  */
-class Solution {
+class Solution {                                                    //三个核心：第一引入最后的空节点；第二：引入节点防止后续链表反转后找不到入口；第三：每次创建临时节点指向即将反转的下个节点
 public:
     ListNode* reverseList(ListNode* head) {
         ListNode* cur=nullptr;                  //同样不要忘记是指向链表类型的指针
@@ -14,9 +14,25 @@ public:
         while(pre!=nullptr){
             ListNode* temp=pre->next;           //注意这里不要用pre=pre->next，否则没办法移动cur了
             pre->next=cur;                     //核心操作，翻转链表，即把pre的指针域指向前面的节点
-            cur=pre;                           /*cur前进一部，即cur就是之前的pre
+            cur=pre;                           /cur前进一部，即cur就是之前的pre
             pre=temp;                           pre前进一步，即之前的temp已经前进一步了*/
         }
         return cur;                            //注意最后是return cur不是pre，因为判断条件里pre为空进去了，要翻转最后一个节！！！！这时候第一个节点是cur！！！
+    }
+};
+略微优化的版本：
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        ListNode* prev=nullptr;                                     //最后的空节点
+        ListNode* cur=head;                                         //当前剩余的节点入口
+        ListNode* next=nullptr;                                     //temp值，临时把头节点给别人，但是不能cur=cur->next，仔细体会
+        while(cur){                                                 //先前进一步暂存，然后反转，再把自己给前节点，完成，然后再要回当前节点
+            next=cur->next;
+            cur->next=prev;
+            prev=cur;
+            cur=next;
+        }
+        return prev;
     }
 };
