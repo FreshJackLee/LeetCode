@@ -1,0 +1,49 @@
+1.自己的代码：（错误）
+class Solution {
+public:
+    ListNode* deleteNode(ListNode* head, int val) {
+        if(head->val==val){                         
+            return head->next;
+        }
+        ListNode* temp=head;
+        while(temp->next!=nullptr){
+            if(temp->next->val=val){                    //错误点一：==！！！不是=
+                temp->next=temp->next->next;            //错误点二：当发现链表后，删除操作，这个题目应该结束了，break!!!
+            }
+            temp=temp->next;
+        }
+        return temp;                                      //错误点三：应该返回的是head
+    }
+};
+2.正确的节点：
+class Solution {
+public:
+    ListNode* deleteNode(ListNode* head, int val) {
+        if(head->val==val){
+            return head->next;
+        }
+        ListNode* cur=head;
+        while(cur->next!=nullptr){
+            if(cur->next->val==val){
+                cur->next=cur->next->next;
+                break;
+            }
+            cur=cur->next;
+        }
+        return head;
+    }
+};
+3.别人的代码：
+class Solution {
+public:
+    ListNode* deleteNode(ListNode* head, int val) {
+        if(head->val == val) return head->next;
+        ListNode *pre = head, *cur = head->next;        //其实没必要搞两个节点
+        while(cur != nullptr && cur->val != val) {
+            pre = cur;
+            cur = cur->next;
+        }
+        if(cur != nullptr) pre->next = cur->next;
+        return head;
+    }
+};
