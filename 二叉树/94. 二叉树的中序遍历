@@ -1,0 +1,38 @@
+1.递归的版本：
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> res;
+        inorder(root,res);
+        return res;
+    }
+    void inorder(TreeNode* root,vector<int>& res){
+        if(!root){
+            return;
+        }else{
+            inorder(root->left,res);                      //中序遍历注意左子树为空时，然后返回，然后再打印节点值
+            res.emplace_back(root->val);
+            inorder(root->right,res);
+        }
+    }
+};
+2.迭代的版本：和先序递归很相似
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> res;
+        stack<TreeNode*> st;
+        while(root||!st.empty()){
+            if(root){
+                st.push(root);                      //中序递归也是先压栈，记录信息用来回溯操作
+                root=root->left;                    //然后继续访问左子树
+            }else{                                    //如果发现为空，那么开始操作
+                root=st.top();                        //首先暂存栈顶元素
+                res.emplace_back(root->val);          //打印值（左子树不存在肯定先打印本身）
+                st.pop();                           //栈顶出栈
+                root=root->right;                   //然后对右节点判断
+            }
+        }
+        return res;
+    }
+};
