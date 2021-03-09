@@ -1,0 +1,108 @@
+1.依旧是最简单的递归方法
+class Solution {
+public:
+    vector<int> postorderTraversal(TreeNode* root) {
+        vector<int> res;
+        postorder(root,res);
+        return res;
+    }
+    void postorder(TreeNode* root,vector<int>& res){
+        if(!root){
+            return;
+        }else{
+            postorder(root->left,res);
+            postorder(root->right,res);
+            res.emplace_back(root->val);
+        }
+    }
+};
+2.比较困难的迭代版本：（双栈的版本比较简单，因为 中右左 出栈就是 左右中）
+class Solution {
+public:
+    vector<int> postorderTraversal(TreeNode* root) {
+        stack<TreeNode*> st1;
+        stack<TreeNode*> st2;
+        vector<int> res;
+        //先遍历中右左，遍历的具体操作时入第二个栈
+        while(root||!st1.empty()){
+            if(root){
+                st1.emplace(root);
+                st2.emplace(root);          //抽象意义上的遍历
+                root=root->right;
+            }else{
+                root=st1.top();
+                st1.pop();
+                root=root->left;
+            }
+        }
+        while(!st2.empty()){
+            res.emplace_back(st2.top()->val);
+            st2.pop();
+        }
+        return res;
+    }
+};
+3.困难模式：不需要第二个栈
+class Solution {
+public:
+    vector<int> postorderTraversal(TreeNode *root) {
+        vector<int> res;                              //注意这个优化，先不要创建其他东西，仅仅创建需要返回的东西，当传入的节点不为空时，再创建其他所需要的数据
+        if (root == nullptr) {
+            return res;
+        }
+
+        stack<TreeNode*> stk;
+        TreeNode *prev = nullptr;                     //这个是关键，因为后续遍历的特殊性，必须有个额外的节点暂存（仔细体会这句话）
+        while (root != nullptr || !stk.empty()) {       //同样的也是一个while循环，节点不为空或者栈不为空
+            while (root != nullptr) {                 //左节点遍历完全，直到低
+                stk.emplace(root);                      //根也是先入栈
+                root = root->left;
+            }
+            root = stk.top();                           //先取出栈顶元素，即最后一个没有左孩子的根节点
+            stk.pop();                                  //同样的出栈（类似先序和中序遍历），后面依次是各个根节点，只要再top()即可完成回溯的操作
+            if (root->right == nullptr || root->right == prev) {      //如果右孩子是空的或者右孩子等于暂存节点，这时候左孩子一定也是空节点
+                res.emplace_back(root->val);                        //当前节点的元素输出
+                prev = root;                                      //暂存当前节点到暂存节点
+                root = nullptr;                                     //当前节点为空
+            } else {                                      //右孩子不为空
+                stk.emplace(root);                        //右孩子入栈（注意再次的入栈操作）
+                root = root->right;                       //然后节点跑到右孩子上
+            }
+        }
+        return res;
+    }
+};
+4.容易理解的版本：                          //这个理解比较深刻，访问极其避免重复访问的问题
+class Solution {
+public:
+    vector<int> postorderTraversal(TreeNode *root) {
+        if (!root) return {};
+        vector<int> vec;
+        stack<TreeNode *> stk;
+        TreeNode *prev = nullptr;
+        auto node = root;
+        while (!stk.empty() || node) {
+            // 1.遍历到最左子节点
+            while (node) {
+                stk.emplace(node);
+                node = node->left;
+            }
+            node = stk.top(); stk.pop();
+            // 2.遍历最左子节点的右子树(右子树存在 && 未访问过)
+            if (node->right && node->right != prev) {
+                // 重复压栈以记录当前路径分叉节点
+                stk.emplace(node);
+                node = node->right;      
+            } else {
+                // 后序：填充vec在node->left和node->right后面
+                // 注意：此时node的左右子树应均已完成访问
+                vec.emplace_back(node->val);
+                // 避免重复访问右子树[记录当前节点便于下一步对比]
+                prev = node;
+                // 避免重复访问左子树[设空节点]
+                node = nullptr;
+            }
+        }
+        return vec;
+    }
+};
