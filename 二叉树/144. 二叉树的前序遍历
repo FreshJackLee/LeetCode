@@ -1,0 +1,37 @@
+1.递归代码：
+class Solution {                                    //为什么分为两个函数？第一需要返回结果，一个函数返回就结束了，还有需要有个res数组
+public:
+    vector<int> preorderTraversal(TreeNode* root) {       
+        vector<int> res;
+        preorder(root,res);
+        return res;
+    }
+    void preorder(TreeNode* root,vector<int>& res){
+        if(!root){
+            return;
+        }
+        res.emplace_back(root->val);
+        preorder(root->left,res);                   //注意这里是调用自己的递归！！！
+        preorder(root->right,res);
+    }
+};
+2.迭代代码：
+class Solution {
+public:
+    vector<int> preorderTraversal(TreeNode* root) {
+        vector<int> res;
+        stack<TreeNode*> st;
+        while(root||!st.empty()){                     //注意两个条件第一：节点非空或者，或者，或者是栈非空
+            if(root){
+                st.push(root);
+                res.emplace_back(root->val);
+                root=root->left;
+            }else{
+                root=st.top();
+                st.pop();
+                root=root->right;
+            }
+        }
+        return res;
+    }
+};
