@@ -1,0 +1,39 @@
+1.官方代码一：利用常规思路
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+        vector<int> vals;
+        while (head != nullptr) {                     //先把链表的值复制到数组中
+            vals.emplace_back(head->val);
+            head = head->next;
+        }
+        for (int i = 0, j = (int)vals.size() - 1; i < j; ++i, --j) {      //对数组利用双指针判断
+            if (vals[i] != vals[j]) {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+2.利用递归的方法：（递归返回是从最底返回的特点）
+class Solution {
+    ListNode* frontPointer;
+public:
+    bool recursivelyCheck(ListNode* currentNode) {
+        if (currentNode != nullptr) {                         //下面是递归反向迭代节点的方式
+            if (!recursivelyCheck(currentNode->next)) {
+                return false;
+            }
+            if (currentNode->val != frontPointer->val) {
+                return false;
+            }
+            frontPointer = frontPointer->next;
+        }
+        return true;
+    }
+
+    bool isPalindrome(ListNode* head) {       //首先进入函数
+        frontPointer = head;                  //复制一个链表
+        return recursivelyCheck(head);        //进入递归函数
+    }
+};
