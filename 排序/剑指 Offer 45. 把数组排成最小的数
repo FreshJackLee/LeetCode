@@ -1,0 +1,14 @@
+1.利用库函数：
+class Solution {
+public:
+    string minNumber(vector<int>& nums) {
+        vector<string> strs;
+        string res;
+        for(int i = 0; i < nums.size(); i++)                //首先第一步：遍历推入字符串数组里
+            strs.push_back(to_string(nums[i]));
+        sort(strs.begin(), strs.end(), [](string& x, string& y){ return x + y < y + x; });    //核心排序规则，顺便复习下lambda表达式
+        for(int i = 0; i < strs.size(); i++)          //然后依次转成字符串输出
+            res.append(strs[i]);
+        return res;
+    }
+};
