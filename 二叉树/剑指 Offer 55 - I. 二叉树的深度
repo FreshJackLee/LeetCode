@@ -1,0 +1,36 @@
+class Solution {                        //深度优先搜索，数的深度等于左子树的深度和右子树深度的最大值中在加一
+public:
+    int maxDepth(TreeNode* root) {
+        if(!root){
+            return 0;
+        }
+        int left = maxDepth(root->left);
+        int right = maxDepth(root->right);
+        
+        return max(left+1, right+1);
+    }
+};
+2.利用层序遍历：
+class Solution {
+public:
+      int maxDepth(TreeNode root) {
+      if (!root) return 0;
+      int depth = 0;
+      queue<TreeNode> q;
+      q.push(root);
+      while (!q.empty()) {
+          int size = q.size();
+          for (int i = 0; i < size; i++) {
+              auto e = q.front();                 //这里可以不用出队的操作，因为要的是进入这个循环就是一层
+              if (e->left) {
+                  q.push(q->left);
+              }
+              if (e->right) {
+                  q.push(e->right);
+              }
+          }
+          depth++;                                //出循环就是实际的层数
+      }
+      return depth;
+  }
+}；
