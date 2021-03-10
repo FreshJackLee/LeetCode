@@ -1,0 +1,43 @@
+1.官方代码：
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector <vector <int>> ret;                        //首先创建一个二维数组记录输出结果
+        if (!root) {
+            return ret;
+        }
+
+        queue <TreeNode*> q;                            //BFS的特征，利用队列的特点进行广度优先搜索
+        q.push(root);                                     //首先根节点入队
+        while (!q.empty()) {                              //只要队列有元素，就一直进行遍历操作
+            int currentLevelSize = q.size();              //这个变量用来记录层数的，简单的BFS只能层序输出但是不能记录层的信息
+            ret.push_back(vector <int> ());                   //注意这个套路，先进去一个匿名对象，然后再加里面的里面的具体元素
+            for (int i = 1; i <= currentLevelSize; ++i) {
+                auto node = q.front(); q.pop();
+                ret.back().push_back(node->val);
+                if (node->left) q.push(node->left);
+                if (node->right) q.push(node->right);
+            }
+        }
+        
+        return ret;
+    }
+};
+2.利用深度优先搜索的思想解决：利用递归
+class Solution {
+public:
+    vector<vector<int>> ret;
+    void level(TreeNode* root, int lev) {
+        if(!root) return;
+        if (lev >= ret.size()) {
+            ret.push_back(vector<int>());
+        }
+        ret[lev].push_back(root -> val);
+        level(root -> left, lev + 1);
+        level(root -> right, lev + 1);
+    }
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        level(root, 0);
+        return ret;
+    }
+};
