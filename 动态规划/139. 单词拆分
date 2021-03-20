@@ -1,0 +1,22 @@
+class Solution {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        auto wordDictSet = unordered_set <string> ();       //利用乱序集合来快速查找string
+        for (auto word: wordDict) {
+            wordDictSet.insert(word);         //先把字典中的字符串插入到集合中，增加查找速度
+        }
+
+        auto dp = vector <bool> (s.size() + 1);     注意dp[i]的含义：字符串前i个字符组成的字符串能否被正确拆分（按照字典里的单词）
+        dp[0] = true;
+        for (int i = 1; i <= s.size(); ++i) {
+            for (int j = 0; j < i; ++j) {
+                if (dp[j] && wordDictSet.find(s.substr(j, i - j)) != wordDictSet.end()) {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+
+        return dp[s.size()];
+    }
+};
