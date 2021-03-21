@@ -1,0 +1,28 @@
+有三种方法：
+方法一：先合并，统一再排序，较差
+方法二：常规方法，双指针从前往后，能够利用到数组有序的情况，缺点：需要额外空间
+方法三：双指针从后往前排序，因为数组一足够长所以不会覆盖
+class Solution {
+public:
+    void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
+        int i=m-1;
+        int j=n-1;
+        int k=m+n-1;
+        while(i>=0&j>=0){
+            if(nums1[i]>nums2[j]){
+                nums1[k]=nums1[i];
+                --k;
+                --i;
+            }else{
+                nums1[k]=nums2[j];
+                --k;
+                --j;
+            }
+        }
+        while(j>=0){            //注意条件是j>=0!!!!
+            nums1[k]=nums2[j];
+            --k;
+            --j;
+        }
+    }
+};
