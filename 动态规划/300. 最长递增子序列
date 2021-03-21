@@ -1,0 +1,20 @@
+代码：
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        int n = (int)nums.size();
+        if (n == 0) {
+            return 0;
+        }                                           //定义dp[i]为前i个元素，以**第i个数字结尾**的最长上升子序列的长度，缩小规模，从子问题解释
+        vector<int> dp(n, 0);                                 //注意技巧状态转移，dp[i]和dp[j]之间发生状态转移
+        for (int i = 0; i < n; ++i) {
+            dp[i] = 1;                          //注意每次遍历状态时，先重置为1
+            for (int j = 0; j < i; ++j) {         //然后遍历字串，如果改位置元素大，说明可以添加，并且一定要大于dp[i]=1才可以转移状态
+                if (nums[j] < nums[i]) {
+                    dp[i] = max(dp[i], dp[j] + 1);
+                }
+            }
+        }
+        return *max_element(dp.begin(), dp.end());
+    }
+};
