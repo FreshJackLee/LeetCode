@@ -1,0 +1,111 @@
+1.复杂度但是思路简单的方法：
+class Solution {
+public:
+    vector<int> smallestK(vector<int>& arr, int k) {
+        vector<int> res;
+        sort(arr.begin(),arr.end());          //先排序
+        for(int i=0;i<k;++i){                 //然后利用for循环遍历插入即可
+            res.emplace_back(arr[i]);
+        }
+        return res;
+    }
+};
+2.自己想的奇怪的想法：
+class Solution {
+public:
+    vector<int> smallestK(vector<int>& arr, int k) {
+        vector<int> res;
+        if(k==0){                   //这个是防止后面res[k-1]数组下标不合法问题
+           return res; 
+        }
+        for(int i=0;i<k;++i){
+            res.emplace_back(arr[i]);
+        }
+        for(int i=k;i<arr.size();++i){
+            sort(res.begin(),res.end());
+            if(arr[i]<res[k-1]){
+                res[k-1]=arr[i];        //注意这里不是emplace_back因为res的元素数量已经固定了
+            }
+        }
+        return res;
+    }
+};
+3.基于2的优化版本：
+class Solution {
+public:
+    vector<int> smallestK(vector<int>& arr, int k) {
+        vector<int> res;
+        if(k==0){
+           return res; 
+        }
+        priority_queue<int> pq;                       //利用优先队列自动重拍元素
+        for(int i=0;i<k;++i){
+            pq.push(arr[i]);
+        }
+        for(int i=k;i<arr.size();++i){
+            if(arr[i]<pq.top()){
+                pq.pop();                         //注意pop()里面不能有参数
+                pq.push(arr[i]);
+            }
+        }
+        while(!pq.empty()){                   //优先队列也不能使用范围for语句
+            res.emplace_back(pq.top());
+            pq.pop();
+        }
+        return res;
+    }
+};
+4.基于快速排序的方法：
+能用快排的原因，题目里面有【以任意顺序】 步骤
+随便找个数，进行一轮快排
+快排结束，进行数据划分,假设这个数属于第t个
+t==k，那么返回前t个；
+t > k，那么问题规模缩小为在前面t-1个数找k个；
+t < k，说明已经确定前t个数属于前k个，但是第t+1到k这些数还没确定，那么问题规模缩小为从t+1到右边界找k-t个数
+//自己的代码，没有使用随机选取pivot元素的方法
+class Solution {
+public:
+    vector<int> smallestK(vector<int>& arr, int k) {
+        vector<int> res;
+        quickSort_part(arr,0,arr.size()-1,k);
+        for(int i=0;i<k;++i){
+            res.emplace_back(arr[i]);
+        }
+        return res;
+    }
+    void quickSort_part(vector<int>& arr,int left,int right,int k){
+        int pivotpos=0;
+        if(left<right){
+            pivotpos=Partition(arr,left,right);
+            if(pivotpos==k){
+                return;
+            }else if(pivotpos<k){
+                quickSort_part(arr,pivotpos+1,right,k);         //注意范围，如果小于k,一定要是【pivotpos+1,right】
+            }else{                                              //pivotpos+1才能缩小规模（因为没有随机选取，是从最左端开始）
+                quickSort_part(arr,left,pivotpos-1,k);          //right一定要，如果是K那么K右边如果有小于k位置的数，排序不到的
+            }
+        }
+    }
+    int Partition(vector<int>& arr,int left,int right){
+        int i=left;
+        int j=right;
+        int pivot=arr[left];
+        while(i<j){
+            while(i<j&&arr[j]>=pivot){
+                --j;
+            }
+            if(i<j){
+                swap(arr[i],arr[j]);
+                ++i;
+            }
+            while(i<j&&arr[i]<=pivot){
+                ++i;
+            }
+            if(i<j){
+                swap(arr[i],arr[j]);
+                --j;
+            }
+        }
+        return j;
+    }
+};
