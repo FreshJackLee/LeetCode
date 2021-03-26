@@ -10,7 +10,7 @@
  */
 class Solution {
 public:
-    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {//注意是引入哑节点，不要直接ListNode* dummy;这是错误的！！！可以创建一个对象，也可以用ListNode* dummy=new ListNode(0);
         ListNode dummy(-1);                             //引入哑节点避免边界问题，最后输出链表时返回dummy.next即可放弃这个哑节点
         ListNode *pre=&dummy;                           //引入一个指针目的是记录最后一个接上的节点
         while(l1!=nullptr&&l2!=nullptr){                //只要不为空，即可进入循环，注意不是l1->next==nullptr！！！l1->next代表l1的下一个节点不是当前节点！！！
