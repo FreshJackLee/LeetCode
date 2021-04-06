@@ -1,0 +1,133 @@
+暴力解法：O(n3)好像超时了
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        string res;
+        int len=s.size();
+        if(1==len){
+            res=s;
+            return res;
+        }
+        int maxlen=1;               //注意这里有两种思路，第一初始化为INT_MIN,然后j从i位置开始
+        int begin=0;
+        for(int i=0;i<len-1;++i){       //单个字符就是回文串，注意这里不要越界，因为j是从i+1位置开始的
+            for(int j=i+1;j<len;++j){
+                if(palindromeString(s,i,j)){
+                    maxlen=max(maxlen,j-i+1);
+                    if(maxlen==j-i+1){      //或者两个if合并：if(j-i+1>maxlen && substring(s,i,j)){maxlen=j-i+1;begin=i;}
+                    	begin=i;
+					}
+                }
+            }
+        }
+        for(int i=pos;i<begin+maxlen;++i){    //这里可以直接调用库函数substr(start,length)
+            res.push_back(s[i]);
+        }
+        return res;
+    }
+    bool palindromeString(string &s,int left,int right){
+        while(left<right){
+            if(s[left]!=s[right]){
+                return false;
+            }
+            left++;
+            right--;
+        }
+        return true;
+    }
+};
+优化的暴力解法（O(n2)）:中心扩散法
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        string res;
+        int len=s.size();
+        if(1==len){
+            res=s;
+            return res;
+        }
+        int maxlen=1;
+        int begin=0;
+        for(int i=0;i<len-1;++i){                                   //通过一次遍历，为什么下面两次函数调用可行？因为只要有一个大就可以
+            int oddlen=expandAroundCenter(s,i,i);       //注意这种扩散法，奇偶字串要分别处理，奇数就是本身开始扩散，偶数加一再扩散
+            int evenlen=expandAroundCenter(s,i,i+1);
+            int curMaxlen=max(oddlen,evenlen);
+            if(curMaxlen>maxlen){
+                maxlen=curMaxlen;
+                begin=i-(maxlen-1)/2;                 //有两种方法，第一种通过函数返回，第二种通过规律公式
+            }
+        }
+        for(int i=begin;i<begin+maxlen;++i){
+            res.push_back(s[i]);
+        }
+        return res;
+    }
+    int expandAroundCenter(string &s,int left,int right){       //返回的值是符合 回文串的最大长度
+        int len=s.size();
+        while(left>=0&&right<len){
+            if(s[left]!=s[right]){
+                break;
+            }
+            left--;                             //注意扩散的方向和之前的刚好相反
+            right++;
+        }
+        return right-left-1; //实际：right-left+1-2，因为多跳一次所以要减去2；
+    }
+};
+动态规划方法(官方)：     状态dp[i][j]表示s[i...j]这个串是否为回文串
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        int n = s.size();
+        vector<vector<int>> dp(n, vector<int>(n));
+        string ans;
+        for (int l = 0; l < n; ++l) {
+            for (int i = 0; i + l < n; ++i) {
+                int j = i + l;
+                if (l == 0) {
+                    dp[i][j] = 1;
+                } else if (l == 1) {
+                    dp[i][j] = (s[i] == s[j]);
+                } else {
+                    dp[i][j] = (s[i] == s[j] && dp[i + 1][j - 1]);
+                }
+                if (dp[i][j] && l + 1 > ans.size()) {
+                    ans = s.substr(i, l + 1);
+                }
+            }
+        }
+        return ans;
+    }
+};
+动态规划：易懂版
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        int n = s.size();
+        // dp[left][right]标记从i到j是否是字串
+        vector<vector<int>> dp(n, vector<int>(n));
+        string ans;
+        // length表示判断的字串的长度
+        // left表示字串的左边起始位置
+        // right表示字串的右边起始位置
+        for(int length = 0; length < n; length++){
+            for(int left = 0; left + length < n; left++){
+                int right = left + length;
+                // 即字符串长度为1时，矩阵对角线
+                if(length == 0) dp[left][right] = 1; 
+                // 字符串长度为2的时候，只需判断两者是否相等
+                else if(length == 1) dp[left][right] = (s[left] == s[right]); 
+                else{  // 字符串长度大于等于3之后
+                       // 其是否是回文串取决于当前left和right及更小一号的字符串
+                       // 更新参考值为矩阵的左下方
+                    dp[left][right] = (s[left] == s[right] && dp[left + 1][right - 1]);
+                }
+                // 如果当前left位置到right位置的字串能够构成回文串，并且现在长度+1后大于之前记忆中的子回文串的长度，那么更新回文串！这里也可以优化成记录起始位置和长度的两个int，返回时再截取
+                if(dp[left][right] && (length + 1) > ans.size()){
+                    ans = s.substr(left, length + 1);
+                }
+            }
+        }
+        return ans;
+    }
+};
