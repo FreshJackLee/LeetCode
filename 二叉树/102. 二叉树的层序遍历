@@ -1,4 +1,4 @@
-1.官方代码：
+1.官方代码：整个代码时返回vector<vector<int>>
 class Solution {
 public:
     vector<vector<int>> levelOrder(TreeNode* root) {
@@ -23,7 +23,29 @@ public:
         return ret;
     }
 };
-2.利用深度优先搜索的思想解决：利用递归
+2.返回vector<int>版本的代码：
+class Solution {
+public:
+    vector<int> levelOrder(TreeNode* root) {
+        vector<int> res;
+        if(!root)
+            return res;
+        queue<TreeNode*> q;
+        q.push(root);
+        while(q.size()){
+            TreeNode* node=q.front();
+            q.pop();
+            res.push_back(node->val);
+            if(node->left)
+                q.push(node->left);
+            if(node->right)
+                q.push(node->right);
+        }
+        return res;
+
+    }
+};
+3.利用深度优先搜索的思想解决：利用递归
 class Solution {
 public:
     vector<vector<int>> ret;
