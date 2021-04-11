@@ -1,0 +1,120 @@
+普通队列版本：                   //二叉树的层序遍历核心是利用队列整个数据结构，而二叉树的先，中，后遍历时利用栈的数据结构
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> res;            //res用来返回结果，里面的元素都是一层的元素
+        if(root==NULL) return res;
+        vector<int> temp_res;               //当作res中的每一个元素
+        queue<TreeNode*> q;                 //队列实现遍历功能
+        q.push(root);                         //首先推入根节点
+        int left_to_right = 1;                //标识哪一行正序，哪一行反序
+        while(!q.empty()){                    //主循环过程，只要队列不为空就一直循环
+            int q_size = q.size();            //要用一个int 存储队列的长度，不能用q.size()，因为整个函数会动态更新size
+            temp_res.clear();
+            for(int i=0; i<q_size; ++i){            
+                TreeNode *temp = q.front(); 
+                q.pop();
+                temp_res.push_back(temp->val);
+                if(temp->left) q.push(temp->left);
+                if(temp->right) q.push(temp->right);
+            }
+            if(left_to_right % 2){
+                res.push_back(temp_res);
+            }else{
+                reverse(temp_res.begin(), temp_res.end());        //前面代码都是正常的层序遍历，在这里判断奇偶性然后进行反转，复用以前的思想和代码
+                res.push_back(temp_res);
+            }
+            left_to_right++;
+        }
+        return res;
+    }
+};
+2.双端队列版本
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> res;
+        if (root==NULL)
+            return res;
+        bool flag = true; //从左向右打印为true，从右向左打印为false            //不用odd_even然后对2取余，用单标志程序效率高，最差用odd_even & 1判断奇偶
+        deque<TreeNode*> q;
+        q.push_back(root);
+        while (!q.empty())
+        {
+            int n = q.size();
+            vector<int> out;
+            TreeNode* node;
+            while (n>0)
+            {
+                if (flag) // 前取后放：从左向右打印，所以从前边取，后边放入
+                {
+                    node = q.front();
+                    q.pop_front();
+                    if (node->left)
+                        q.push_back(node->left);  // 下一层顺序存放至尾
+                    if (node->right)
+                        q.push_back(node->right);
+                }
+                else  //后取前放： 从右向左，从后边取，前边放入
+                {
+                    node = q.back();
+                    q.pop_back();
+                    if (node->right)
+                        q.push_front(node->right);  // 下一层逆序存放至首
+                    if (node->left)
+                        q.push_front(node->left);
+                }
+                out.push_back(node->val);
+                n--;
+            }
+            flag = !flag;
+            res.push_back(out);
+        }
+        return res;
+    }
+};
+3.自己的版本：
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> res;            //用来返回结果
+        vector<int> temp;                       //暂存res的元素结果
+        if(!root){
+            return res;             //如果为空，提前返回
+        }
+        deque<TreeNode*> dq;              //用双端队列减少queue的反转操作，（tip:注意元素时TreeNode*，不要忘记了时指针类型）
+        int len;                            //因为返回结果时vector<vector<int>>需要区分每一层的元素
+        bool flag=true;                             //奇偶性判断,由左到右为true，反之为false
+        dq.push_back(root);                 //先把根节点推入队列中
+        while(!dq.empty()){                     //主循环过程
+            len=dq.size();
+            TreeNode* node;                 //先定义，不然后面要出作用域了
+            for(int i=0;i<len;++i){
+                if(flag){
+                    node=dq.front();          //正常输出的话就是正常的队列，取队首，出队首，然后依次left，right入队
+                    dq.pop_front();
+                    if(node->left){
+                        dq.push_back(node->left);
+                    }
+                    if(node->right){
+                        dq.push_back(node->right);
+                    }                  
+                }else{
+                    node=dq.back();           //要反序输出的话就是反向队列，取队尾，出队尾，然后依次right,left入队！！！注意是先right入队再left入队！！！
+                    dq.pop_back();
+                    if(node->right){
+                        dq.push_front(node->right);
+                    }
+                    if(node->left){
+                        dq.push_front(node->left);
+                    }                    
+                }
+                temp.push_back(node->val);
+            }
+            res.push_back(temp);
+            temp.clear();
+            flag=!flag;
+        }
+        return res;
+    }
+};
