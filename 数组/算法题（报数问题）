@@ -1,0 +1,37 @@
+有n个人围城一圈，然后报道m出队，求最后的人的位置下标
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std; 
+int seq_num(int n,int m){
+	int pos=0;
+	vector<bool> a(n,true);
+	int i=0;					//每次数组索引下标，因为数组最后也给下标是N-1，所以i从0开始，但是逻辑意义是从1到N的遍历访问过程
+	int cnt=0;					//用来标记报数的当前位置 
+	int leftcnt=n;				//剩余人数 
+	while(leftcnt>1){
+		if(a[i%n]==true){                 //注意这个取余是实现循环遍历的关键
+			++cnt;	
+		}
+		if(cnt==m){
+			cnt=0;
+			a[i%n]=false;
+			leftcnt--;
+		}
+		++i;		//注意这个i是一直增大的，但是对其取余可以做到循环遍历数组  
+	}
+	for(int i=0;i<n;++i){     //不能通过i直接或者间接导出位置，因为i的最后位置不确定
+		if(a[i]==true){
+			pos=i;
+		}
+	}
+	return pos;			
+}
+
+int main(){
+	int n,m;
+	while(cin>>n>>m){
+		cout<<seq_num(n,m)<<endl; 
+	}
+	return 0;
+}
