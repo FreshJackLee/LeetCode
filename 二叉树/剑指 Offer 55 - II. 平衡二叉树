@@ -1,0 +1,60 @@
+1.有bug的代码：                        //bug来源：很明显，左子树的最大深度和右子树的最大深度如果一致，也有可能不是平衡树，程序想法错的
+class Solution {
+public:
+    bool isBalanced(TreeNode* root) {
+        if(!root){
+            return true;
+        }
+        int left_deepth=0;
+        int right_deepth=0;
+        if(root->left){
+            left_deepth=dfs(root->left);
+        }
+        if(root->right){
+            right_deepth=dfs(root->right);
+        }
+        if(abs(left_deepth-right_deepth)>1){              //不能这么想bug修复:不仅根节点的子树深度小于2，且其子树也要是平衡树
+            return false;
+        }
+        return true;
+    }
+    int dfs(TreeNode* root){
+        if(!root){
+            return 0; 
+        }
+        return max(dfs(root->left),dfs(root->right))+1;
+    }
+};
+2.bug优化版本：
+class Solution {
+public:
+    bool isBalanced(TreeNode* root) {
+        if(!root){
+            return true;
+        }
+        return abs(dfs(root->left)-dfs(root->right))<2&&isBalanced(root->left)&&isBalanced(root->right);  //根节点字数深度差小于2，
+    }                                                                             //且！！！注意，其左右字数同样是平衡树
+    int dfs(TreeNode* root){
+        if(!root){
+            return 0; 
+        }
+        return max(dfs(root->left),dfs(root->right))+1;
+    }
+};
+3.别人的代码：
+class Solution {
+public:
+    bool ret = true;
+    int get_height(TreeNode* root){
+        if(!root || !ret) return 0;
+        int l = get_height(root->left) + 1,
+            r = get_height(root->right) + 1;
+        if(abs(l - r) > 1) ret = false;
+        return max(l, r);
+    }
+
+    bool isBalanced(TreeNode* root) {
+        if(!root) return true;
+        return abs(get_height(root->left) - get_height(root->right)) <= 1 && ret;
+    }
+};
