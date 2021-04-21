@@ -1,0 +1,80 @@
+1.自己的代码：
+class Solution {
+public:
+    vector<TreeNode*> serachBinary(TreeNode* root,TreeNode* p){             //打印路径（利用线索数的特点，如果小于目标值就在左子树找，否则在右子树找）
+        vector<TreeNode*> ans;  
+        while(root->val!=p->val){
+            ans.push_back(root);
+            if(root->val>p->val){
+                root=root->left;
+            }else{
+                root=root->right;
+            }
+        }
+        ans.push_back(root);                                        //注意一定要加这个，例如：假如目标就是根节点，那么就会有BUG，因为相同的节点没有机会在循环里push_back
+        return ans;
+    }
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        vector<TreeNode*> v1=serachBinary(root,p);
+        vector<TreeNode*> v2=serachBinary(root,q);
+        int i=v1.size()-1;
+        int j=v2.size()-1;
+        int index=min(i,j);
+        while(v1[index]!=v2[index]){                 
+            --index;
+        }
+        return v1[index];
+    }
+};
+2.官方代码：
+class Solution {
+public:
+    vector<TreeNode*> getPath(TreeNode* root, TreeNode* target) {
+        vector<TreeNode*> path;
+        TreeNode* node = root;
+        while (node != target) {
+            path.push_back(node);
+            if (target->val < node->val) {
+                node = node->left;
+            }
+            else {
+                node = node->right;
+            }
+        }
+        path.push_back(node);
+        return path;
+    }
+
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        vector<TreeNode*> path_p = getPath(root, p);
+        vector<TreeNode*> path_q = getPath(root, q);
+        TreeNode* ancestor;
+        for (int i = 0; i < path_p.size() && i < path_q.size(); ++i) {    //这里用正序，注意相等并没有停止，直到不相同就停止了，恰巧就是最近的公共节点，个人觉得直接倒序不就好了？？？
+            if (path_p[i] == path_q[i]) {
+                ancestor = path_p[i];
+            }
+            else {
+                break;
+            }
+        }
+        return ancestor;
+    }
+};
+3.最佳算法：                                         //核心思想：线索二叉树左子树的所有值永远小于等于根节点的值，而根节点的值永远小于等于右子树的所有值！！！
+class Solution {                                    //所有，如果出现一个小于根节点，一个大于根节点，那么一定是最近的公共节点@@@@@@
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        TreeNode* ans;
+        while(true){
+            if(p->val<root->val&&q->val<root->val){
+                root=root->left;
+            }else if(p->val>root->val&&q->val>root->val){
+                root=root->right;
+            }else{
+                ans=root;
+                break;
+            }
+        }
+        return ans;
+    }
+};
