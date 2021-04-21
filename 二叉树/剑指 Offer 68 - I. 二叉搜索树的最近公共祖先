@@ -78,3 +78,14 @@ public:
         return ans;
     }
 };
+4.递归代码：
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if(max(p->val,q->val)<root->val)                                                        //如果最大值小于根节点的值，那么节点一定都在左子树里
+            return lowestCommonAncestor(root->left,p,q);
+        if(min(p->val,q->val)>root->val)                                                         //如果最小值小于大于根节点的值，那么节点一定都在右子树里
+            return lowestCommonAncestor(root->right,p,q);
+        return root;
+    }
+}
