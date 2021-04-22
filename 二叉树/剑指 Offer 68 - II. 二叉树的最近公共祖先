@@ -1,0 +1,74 @@
+1.未解决的代码：
+class Solution {
+public:
+    vector<TreeNode*> serachBinary(TreeNode* root,TreeNode* target){
+        vector<TreeNode*> ans;
+        stack<TreeNode*> st;
+        while(root||!st.empty()){
+            if(root){
+                st.push(root);
+                if(root->val==target->val){
+                    break;
+                }
+                root=root->left;
+            }else{
+                root=st.top();
+                st.pop();
+                root=root->right;
+            }
+        }
+        while(!st.empty()){
+            ans.push_back(st.top());
+            st.pop();
+        }
+        return ans;
+    }
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        vector<TreeNode*> v1=serachBinary(root,p);
+        vector<TreeNode*> v2=serachBinary(root,q);
+        int i=v1.size()-1;
+        int j=v2.size()-1;
+        while(v1[i]==v2[j]){
+            --i;
+            --j;
+            if(v1[i]!=v2[j]){
+                ++i;
+            }
+        }
+        return v1[i];
+    }
+};
+class Solution {
+public:
+    void dfs(TreeNode* root,TreeNode* target,vector<TreeNode*>& v,int& flag){
+        if(flag==1||!root){               //递归终止的条件，注意仔细体会这个flag的用法！！！！！
+            return;
+        }
+        if(root->val==target->val){                 //递归终止
+            flag=1;
+        }
+        v.emplace_back(root);
+        dfs(root->left,target,v,flag);
+        dfs(root->right,target,v,flag);
+        if(!flag){                                //flag的妙用！！！！！
+            v.pop_back();
+        }
+    }
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        TreeNode* ans=root;
+        int flag=0;
+        vector<TreeNode*> v1;
+        vector<TreeNode*> v2;
+        dfs(root,p,v1,flag);
+        flag=0;                                       //这里千千万万不要忘记，这个是一个引用，老子看了好久才发现这个bug，我也是服了。。。
+        dfs(root,q,v2,flag);
+        for(int i=0;i<v1.size()&&i<v2.size();++i){
+            if(v1[i]==v2[i]){
+                ans=v1[i];
+            }else{
+                break;
+            }
+        }
+        return ans;
+    }
+};
