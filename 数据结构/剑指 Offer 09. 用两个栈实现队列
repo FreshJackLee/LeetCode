@@ -1,1 +1,33 @@
-
+class CQueue {
+    stack<int> stack1,stack2;
+public:
+    CQueue() {
+        while (!stack1.empty()) {
+            stack1.pop();
+        }
+        while (!stack2.empty()) {
+            stack2.pop();
+        }
+    }
+    
+    void appendTail(int value) {                //添加操作不用操作两个栈
+        stack1.push(value);
+    }
+    
+    int deleteHead() {                      
+        // 如果第二个栈为空
+        if (stack2.empty()) {                     //如果第二个用删除的栈为空，那么看一下添加到栈是否为空，如果不空就依次转移
+            while (!stack1.empty()) {            
+                stack2.push(stack1.top());
+                stack1.pop();
+            }
+        } 
+        if (stack2.empty()) {               //如果仍旧为空，说明没有元素可供弹出，就返回-1，或者刚开始俩栈都为空直接返回-1（这个最佳！！！）
+            return -1;
+        } else {
+            int deleteItem = stack2.top();    //否则返回队列的top,然后执行真正的删除操作
+            stack2.pop();
+            return deleteItem;
+        }
+    }
+};
