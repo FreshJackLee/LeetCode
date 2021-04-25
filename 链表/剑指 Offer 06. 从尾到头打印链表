@@ -1,0 +1,26 @@
+class Solution {
+public:
+    vector<int> reversePrint(ListNode* head) {
+        vector<int> ans;
+        if(!head){
+            return ans;
+        }
+        while(head){
+            ans.push_back(head->val);
+            head=head->next;
+        }
+        reverse(ans.begin(),ans.end());
+        return ans;
+    }
+};
+2.递归？递归？递归？
+class Solution {
+public:
+    vector<int> reversePrint(ListNode* head) {
+        if(!head)
+            return {};
+        vector<int> a=reversePrint(head->next);
+        a.push_back(head->val);
+        return a;
+    }
+};
