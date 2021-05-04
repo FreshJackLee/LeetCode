@@ -45,4 +45,31 @@ public:
         }
     }
 };
-还有搜索剪枝的方法，暂时没有理解完全，以后有机会再说吧
+3.剪枝操作：
+class Solution {
+public:
+    vector<string> permutation(string s) {
+        vector<string> ans;
+        int len=s.size()-1;
+        sort(s.begin(),s.end());
+        dfs(s,ans,0,len);
+        return ans;
+    }
+    void dfs(string& s,vector<string>& ans,int k,int& len){
+        if(k==len){
+            ans.push_back(s);
+            return ;
+        }else{
+            set<char> temp;                              //注意是每一次固定的时候都要创建这个变量不能是引用共用一个
+            for(int i=k;i<=len;++i){
+                if(temp.find(s[i])!=temp.end()){            //重复的本质是固定位置的时候重复固定，因此在固定的时候检查是否固定过
+                    continue;                               //如果固定过，即set里面找到了，不用固定了，继续下一次for循环即可
+                }
+                temp.insert(s[i]);
+                swap(s[i],s[k]);
+                dfs(s,ans,k+1,len);
+                swap(s[i],s[k]);
+            }
+        }
+    }
+};
