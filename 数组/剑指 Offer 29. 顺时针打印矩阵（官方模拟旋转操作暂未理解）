@@ -1,0 +1,172 @@
+1.自己写的有bug的版本：                                    //第一个bug：不能打印最后一个元素，第二个bug：如果只有一行，会多打印，程序在36-39行会重复打印结果
+class Solution {
+public:                                                   
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        vector<int> ans;                                    //这里其实可以有优化，已经知道vector的大小提前分配完全，防止中途扩增造成性能降低
+        int row=matrix.size();
+        if(row==0){
+            return ans;
+        }
+        int column=matrix[0].size();
+        int i=0;
+        int j=0;
+        while(i<(row+1)/2){                       //第三个bug，实际条件应该为：i<(row+1)/2&&j<(column+1)/2，例如只有一列会造成越界访问！！！
+            recur(matrix,ans,i,j);
+            ++i;
+            ++j;
+        }
+        return ans;
+    }
+    void recur(vector<vector<int>>& matrix,vector<int>& ans,int i,int j){
+        int m=i;
+        int n=j;
+        int cnt=j;
+        /*第一行往右打印*/
+        while(j<cnt+matrix[0].size()-cnt*2-1){
+            ans.push_back(matrix[i][j]);
+            ++j;
+        }
+        /*最后一列往下打印*/
+        cnt=i;
+        while(i<cnt+matrix.size()-cnt*2-1){
+            ans.push_back(matrix[i][j]);
+            ++i;
+        }
+        /*最后一行往左打印*/
+        while(j>n){
+            ans.push_back(matrix[i][j]);
+            --j;
+        }
+        /*第一列往上打印*/
+        while(i>m){
+            ans.push_back(matrix[i][j]);
+            --i;
+        }
+    }
+};
+2.修复bug但是逻辑不好的代码：
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        vector<int> ans;
+        int row=matrix.size();
+        if(row==0){
+            return ans;
+        }
+        int column=matrix[0].size();
+        int i=0;
+        int j=0;
+        while(i<(row+1)/2&&j<(column+1)/2){
+            print(matrix,ans,i,j);
+            ++i;
+            ++j;
+        }
+        return ans;
+    }
+    void print(vector<vector<int>>& matrix,vector<int>& ans,int i,int j){
+        int m=i;
+        int n=j;
+        int cnt=j;
+        /*第一行往右打印*/
+        while(j<cnt+matrix[0].size()-cnt*2){
+            ans.push_back(matrix[i][j]);
+            ++j;
+        }
+        if(ans.size()==matrix.size()*matrix[0].size()){
+        	return;
+		} 
+        --j;
+        /*最后一列往下打印*/
+        cnt=i;
+        ++i;
+        while(i<cnt+matrix.size()-cnt*2){
+            ans.push_back(matrix[i][j]);
+            ++i;
+        }
+        if(ans.size()==matrix.size()*matrix[0].size()){
+        	return;
+		} 
+        --i;
+        --j;
+        /*最后一行往左打印*/
+        while(j>=n){
+            ans.push_back(matrix[i][j]);
+            --j;
+        }
+        ++j;
+        --i;
+        /*第一列往上打印*/
+        while(i>m){
+            ans.push_back(matrix[i][j]);
+            --i;
+        }
+    }
+};
+3.官方相同思路的代码：                  //对比自己代码：自己的缺陷1.不用封装函数，浪费性能。2.边界用top.left,right,bottom标记。3.横纵只有一条的判断left < right && top < bottom
+class Solution {                      //4.适当用for循环减少乱。
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        if (matrix.size() == 0 || matrix[0].size() == 0) {
+            return {};                                                //注意这个技巧，提前返回
+        }
+
+        int rows = matrix.size(), columns = matrix[0].size();
+        vector<int> order;                                          //这里可以把内存扩容到目标大小，增加效率
+        int left = 0, right = columns - 1, top = 0, bottom = rows - 1;      //用变量标记边界，对比自己的代码！！！
+        while (left <= right && top <= bottom) {                         
+            for (int column = left; column <= right; column++) {
+                order.push_back(matrix[top][column]);
+            }
+            for (int row = top + 1; row <= bottom; row++) {
+                order.push_back(matrix[row][right]);
+            }
+            if (left < right && top < bottom) {                     //注意这个技巧，避免了多重判断是否只有一行或者只有一列！如果不判断则会回溯操作造成重复遍历
+                for (int column = right - 1; column > left; column--) {
+                    order.push_back(matrix[bottom][column]);
+                }
+                for (int row = bottom; row > top; row--) {
+                    order.push_back(matrix[row][left]);
+                }
+            }
+            left++;
+            right--;
+            top++;
+            bottom--;
+        }
+        return order;
+    }
+};
+4.逻辑简单的代码：
+
+在52题目中有！！！
+
+5.官方另一个代码：模拟方法
+class Solution {
+private:
+    static constexpr int directions[4][2] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        if (matrix.size() == 0 || matrix[0].size() == 0) {
+            return {};
+        }
+        
+        int rows = matrix.size(), columns = matrix[0].size();
+        vector<vector<bool>> visited(rows, vector<bool>(columns));
+        int total = rows * columns;
+        vector<int> order(total);
+
+        int row = 0, column = 0;
+        int directionIndex = 0;
+        for (int i = 0; i < total; i++) {
+            order[i] = matrix[row][column];
+            visited[row][column] = true;
+            int nextRow = row + directions[directionIndex][0], nextColumn = column + directions[directionIndex][1];
+            if (nextRow < 0 || nextRow >= rows || nextColumn < 0 || nextColumn >= columns || visited[nextRow][nextColumn]) {
+                directionIndex = (directionIndex + 1) % 4;
+            }
+            row += directions[directionIndex][0];
+            column += directions[directionIndex][1];
+        }
+        return order;
+    }
+};
