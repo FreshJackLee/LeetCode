@@ -1,0 +1,43 @@
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        vector<int> ans;
+        int rows=matrix.size();
+        if(rows==0){
+            return ans;
+        }
+        int columns=matrix[0].size();                       //定义数据要清晰
+        int top=0;
+        int bottom=rows-1;
+        int left=0;
+        int right=columns-1;
+        int i;
+        while(true){
+            for(i=left;i<=right;++i){
+                ans.push_back(matrix[top][i]);
+            }
+            if(++top>bottom){                           //注意这个技巧，即自增了又判断了，合二为一
+                break;
+            }
+            for(i=top;i<=bottom;++i){
+                ans.push_back(matrix[i][right]);
+            }
+            if(--right<left){
+                break;
+            }
+            for(i=right;i>=left;--i){
+                ans.push_back(matrix[bottom][i]);
+            }
+            if(--bottom<top){
+                break;
+            }
+            for(i=bottom;i>=top;--i){
+                ans.push_back(matrix[i][left]);
+            } 
+            if(++left>right){                             //最后一次的边界收缩不要忘记！！！！！
+                break;
+            }
+        }
+        return ans;
+    }
+};
