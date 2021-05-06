@@ -1,3 +1,4 @@
+1.普通解法：不考虑大数溢出问题
 class Solution {
 public:
     vector<int> printNumbers(int n) {
@@ -10,5 +11,68 @@ public:
             ans.push_back(i);
         }
         return ans;
+    }
+};
+2.真正的解法：用字符串的全排列解决问题
+class Solution {
+private:                                        //注意这个技巧，不需要辅助函数多很多引用参数，直接用类的共有变量即可
+    vector<int> nums;
+    string s;
+public:
+    vector<int> printNumbers(int n) {
+        s.resize(n, '0');                   //注意这个s是复用的每次都用下标的方式覆盖掉以前的值！！！记住这个套路
+        dfs(n, 0);
+        return nums;
+    }
+    
+    // 枚举所有情况
+    void dfs(int end, int index) {
+        if (index == end) {                                 //递归终止条件，位数固定到个位即可
+            deletesZero(); 
+            return;
+        }
+        for (int i = 0; i <= 9; ++i) {                      //全排列套路
+            s[index] = i + '0';                         //遍历输入0-9的字符套路
+            dfs(end, index + 1);
+        }
+    }
+    
+    // 去除首部0
+    void deleteZero() {
+        int pos = 0;
+        while (pos < s.size() && s[pos] == '0')             //pos找出第一个非0的位置 
+            pos++;
+        if (pos != s.size())                              //这里很巧妙避开了000
+            nums.emplace_back(stoi(s.substr(pos)));             //利用库函数切割加转换整数
+    }
+};
+3.优化的剪枝手段：
+class Solution {
+private:
+    vector<int> nums;
+    string s;
+    int flag;
+public:
+    vector<int> printNumbers(int n) {
+        s.resize(n, '0');
+        flag=0;
+        dfs(n, 0);
+        return nums;
+    }
+    
+    // 枚举所有情况
+    void dfs(int end, int index) {
+        if (index == end) {
+            if(flag==0){                                //注意在这里剪枝不是真的剪枝仅仅是去除类似000的操作，stoi会自动去除前面的0
+                flag=1;
+                return;
+            }
+            nums.emplace_back(stoi(s));
+            return;
+        }
+        for (int i = 0; i <= 9; ++i) {
+            s[index] = i + '0';
+            dfs(end, index + 1);
+        }
     }
 };
