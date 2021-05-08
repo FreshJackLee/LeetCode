@@ -1,0 +1,38 @@
+class Solution {
+public:
+    int translateNum(int num) {
+        string s=to_string(num);
+        int len=s.size();
+        vector<int> f(len,0);
+        f[0]=1;
+        f[1]=(s[0]-'0')*10+s[1]-'0'<=25?2:1;            //注意f[1]有可能是2有可能是1
+        int i;
+        for(i=2;i<len;++i){
+            if((s[i-1]-'0')*10+s[i]-'0'<=25&&s[i-1]!='0'){    //注意06这样的不能翻译，并且注意是s[i-1]-'0'不是s[i-1]-0！！！
+                f[i]=f[i-1]+f[i-2];
+            }else{
+                f[i]=f[i-1];
+            }
+        }
+        return f[len-1];        //注意返回的大小
+    }
+};
+2.不用转化字符串的做法：（动态规划和递归难舍难分，参考斐波那契数列的解法）
+class Solution {
+public:
+    int translateNum(int num) {             //这里其实可以直接递归translateNum不用再递归f的
+        if (num == 0) return 1;
+        return f(num);
+    }
+
+    int f(int num) {
+        if (num < 10) {
+            return 1;
+        }
+        if (num % 100 < 26 && num % 100 > 9) {
+            return f(num / 10) + f(num / 100);
+        } else {
+            return f(num / 10);
+        }
+    }
+};
