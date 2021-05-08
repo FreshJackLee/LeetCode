@@ -1,0 +1,76 @@
+1.自己错误的代码：                          //逻辑有问题，会误判，不应该从左上角往右下角移动
+class Solution {
+public:
+    bool findNumberIn2DArray(vector<vector<int>>& matrix, int target) {
+        bool ans=false;
+        int i=0;
+        int j=0;
+        int rows=matrix.size();
+        if(rows==0){
+            return false;
+        }
+        int columns=matrix[0].size();
+        while(i<rows&&j<columns){
+            if(matrix[i][j]==target){
+                return true;
+            }else if(matrix[i][j]<target){
+                ++i;
+                ++j;
+            }else{
+                while(i>=0&&matrix[i][j]>=target){
+                    if(matrix[i][j]==target){
+                        return true;
+                    }
+                    if(--i<0){                //问题一：可能造成越界访问，作为条件判断，以后要注意
+                        return false;
+                    }
+                }
+                i=j;
+                while(j>=0&&matrix[i][j]>=target){
+                    if(matrix[i][j]==target){
+                        return true;
+                    }
+                    if(--j<0){
+                        return false;
+                    }
+                }
+                return false;
+            }
+        }
+        if(j>=columns){                   //问题二，单维度矩阵同样可能造成下面的while循环判断造成越界访问的问题
+            return false;
+        }
+        while(j<columns&&matrix[i][j]<=target){
+            if(matrix[i][j]==target){
+                return true;
+            }
+            if(++j=columns){
+                break;
+            }
+        }
+        return ans;
+    }
+};
+1.自己的代码：线性访问                            //正确性：任意元素，其左边的都比自己要小，其下边的都比自己要大，通过下楼梯可以正确访问
+class Solution {
+public:
+    bool findNumberIn2DArray(vector<vector<int>>& matrix, int target) {
+        int rows=matrix.size();
+        if(rows==0){
+            return false;
+        }
+        int columns=matrix[0].size();
+        int i=0;
+        int j=columns-1;
+        while(i<rows&&j>=0){
+            if(matrix[i][j]==target){
+                return true;
+            }else if(matrix[i][j]>target){
+                --j;
+            }else{
+                ++i;
+            }
+        }
+        return false;
+    }
+};
