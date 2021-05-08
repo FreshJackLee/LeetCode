@@ -1,0 +1,31 @@
+class Solution {
+public:
+    int numRookCaptures(vector<vector<char>>& board) {
+        int cnt = 0, st = 0, ed = 0;
+        int dx[4] = {0, 1, 0, -1};                //x轴的前后移动，刚好对应二维数组[i][j]中的j+1或者-1，Y轴同理
+        int dy[4] = {1, 0, -1, 0};
+        for (int i = 0; i < 8; ++i) {             //首先找到车的城堡
+            for (int j = 0; j < 8; ++j) {
+                if (board[i][j] == 'R') {
+                    st = i;
+                    ed = j;
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < 4; ++i) {                   //寻找四个方向，当i=0往右走，当i=1往下走，当i=2往左走，当i=3往上走
+            for (int step = 0;; ++step) {
+                int tx = st + step * dx[i];           //注意方向数组是怎么运用的
+                int ty = ed + step * dy[i];
+                if (tx < 0 || tx >= 8 || ty < 0 || ty >= 8 || board[tx][ty] == 'B') {     //什么时候停止
+                    break;
+                }
+                if (board[tx][ty] == 'p') {       //如果遇到兵就吃了它，然后计数器加一注意break，因为只能一个方向吃一次！！！
+                    cnt++;
+                    break;
+                }
+            }
+        }
+        return cnt;
+    }
+};
