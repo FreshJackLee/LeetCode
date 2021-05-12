@@ -1,0 +1,106 @@
+1.自己的代码：深度优先搜索
+class Solution {
+private:
+    vector<int> dx{0,1};                        //体会方向数组如何用，以及利用类的成员变量，减少函数的参数
+    vector<int> dy{1,0};
+    int cnt;
+public:
+    int movingCount(int m, int n, int k) {
+        cnt=0;
+        vector<vector<int>> matrix(m,vector<int>(n,0));
+        dfs(matrix,0,0,k);                              //开启深度优先搜索
+        return cnt;
+    }
+    void dfs(vector<vector<int>>& matrix,int i,int j,int& k){
+        if(i>=matrix.size()||j>=matrix[0].size()||calculateIndex(i,j)>k||matrix[i][j]==1){      //注意停止搜索返回条件
+            return;
+        }
+        cnt++;
+        matrix[i][j]=1;                       //这个条件不能确实，想一想走到边界了，虽然不能向右，但是可以向下，会造成重复访问！！！
+        for(int p=0;p<2;++p){     //这道题目的优化，不用向上和向左访问，只需向右和向下访问即可，仔细体会遍历和最佳路径的区别！！！
+            int m=i+dx[p];              //这里不能用i=i+dx[p]因为，for循环之后的i必须是同一个i,如果第一次for后i变化了，是错的！！！
+            int n=j+dy[p];
+            dfs(matrix,m,n,k);
+        }
+    }
+    int calculateIndex(int i,int j){
+        int ans=0;
+        int a=0;
+        int b=0;
+        while(i!=0){                //注意如何计算下标之和，即一个数字的所有数字之和
+            a=a+i%10;
+            i=i/10;
+        } 
+        a=a+i;                    //最高位的数字不要忘记加上！！！！
+        while(j!=0){
+            b=b+j%10;
+            j=j/10;
+        }
+        b=b+j;
+        ans=a+b;
+        return ans;
+    }
+};
+2.官方的递推做法：                      //有点类似于机器人走棋盘，能走到i,j由是否能走到i-1,j或者i,j-1决定，遍历是否可达的个数即可。
+class Solution {
+    int get(int x) {
+        int res=0;
+        for (; x; x /= 10){
+            res += x % 10;
+        }
+        return res;
+    }
+public:
+    int movingCount(int m, int n, int k) {
+        if (!k) return 1;
+        vector<vector<int> > vis(m, vector<int>(n, 0));
+        int ans = 1;
+        vis[0][0] = 1;                                            //初始化，首先肯定能达到0,0
+        for (int i = 0; i < m; ++i) {                                 //对所有的i,j进行遍历
+            for (int j = 0; j < n; ++j) { 
+                if ((i == 0 && j == 0) || get(i) + get(j) > k) continue;
+                // 边界判断                                             //类似于动态规划，状态转移
+                if (i - 1 >= 0) vis[i][j] |= vis[i - 1][j];
+                if (j - 1 >= 0) vis[i][j] |= vis[i][j - 1];
+                ans += vis[i][j];
+            }
+        }
+        return ans;
+    }
+};
+3.官方深度优先搜索：
+class Solution {
+    // 计算 x 的数位之和
+    int get(int x) {
+        int res=0;
+        for (; x; x /= 10) {
+            res += x % 10;
+        }
+        return res;
+    }
+public:
+    int movingCount(int m, int n, int k) {
+        if (!k) return 1;
+        queue<pair<int,int> > Q;
+        // 向右和向下的方向数组
+        int dx[2] = {0, 1};
+        int dy[2] = {1, 0};
+        vector<vector<int> > vis(m, vector<int>(n, 0));
+        Q.push(make_pair(0, 0));
+        vis[0][0] = 1;
+        int ans = 1;
+        while (!Q.empty()) {                      //广度优先的数据结构一般都是利用队列
+            auto [x, y] = Q.front();
+            Q.pop();
+            for (int i = 0; i < 2; ++i) {         //方向数组，进行转弯的操作
+                int tx = dx[i] + x;           //注意变量都是重新定义
+                int ty = dy[i] + y;
+                if (tx < 0 || tx >= m || ty < 0 || ty >= n || vis[tx][ty] || get(tx) + get(ty) > k) continue; //如果到达边界（返回）
+                Q.push(make_pair(tx, ty));              //入队
+                vis[tx][ty] = 1;          //不要忘记标记已访问
+                ans++;
+            }
+        }
+        return ans;
+    }
+};
