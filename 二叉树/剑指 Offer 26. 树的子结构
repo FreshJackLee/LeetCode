@@ -1,0 +1,137 @@
+1.自己有bug的版本：                                        //改进:利用一个vector<TreeNode*>存储所有的和B根节点一样的根节点
+/**T                                                      //遍历所有的根节点，调用dfs，只要有一个返回true，结果就为true
+ * Definition for a binary tree node.           
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+private:
+    int flag;
+    bool ans;
+    TreeNode* root;
+public:
+    bool isSubStructure(TreeNode* A, TreeNode* B) {
+        ans=true;
+        flag=0;
+        root=nullptr;
+        if(!B){                                           //B节点如何是空节点注意处理
+            return false;
+        }
+        searchRoot(A,B);
+        flag=0;
+        dfs(root,B);
+        return ans;
+    }
+    void searchRoot(TreeNode* A,TreeNode* B){               //先到找和B根节点相同的子树结构（有BUG，可能第一个找到的不符合，后面的符合）
+        if(!A||flag){                                     //其次传入了一个指针变量尝试修改指针变量是错误的！！！！具体自己分析
+            return;
+        }
+        if(A->val==B->val){
+            root=A;
+            flag=1;
+        }
+        searchRoot(A->left,B);
+        searchRoot(A->right,B);
+    }
+    void dfs(TreeNode* A,TreeNode* B){
+        if(!A||!B||flag){
+            if(!A&&B||A&&!B){
+                flag=1;
+                ans=false;
+            }
+            return;
+        }
+        if(A->val==B->val){
+            dfs(A->left,B->left);
+            dfs(A->right,B->right);
+        }else{
+            ans=false;
+            flag=1;
+        }
+    }
+};
+2.修复的版本：                              //仍旧有BUG，[10,12,6,8,3,11] [10,12,6,8] 这个例子是正确的，但是程序输出错误
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+private:
+    int flag;
+    bool ans;
+    TreeNode* root;
+    vector<TreeNode*> listRoot;
+public:
+    bool isSubStructure(TreeNode* A, TreeNode* B) {
+        ans=true;
+        flag=0;
+        root=nullptr;
+        if(!B){
+            return false;
+        }
+        searchRoot(A,B);
+        if(listRoot.empty()){
+            return false;
+        }
+        for(auto iter=listRoot.begin();iter!=listRoot.end();++iter){
+            flag=0;
+            dfs(*iter,B);
+            if(ans){
+                break;
+            }
+            if(iter!=listRoot.end()-1){
+                ans=true;
+            }
+        }
+        return ans;
+    }
+    void searchRoot(TreeNode* A,TreeNode* B){
+        if(!A){
+            return;
+        }
+        if(A->val==B->val){
+            listRoot.push_back(A);
+        }
+        searchRoot(A->left,B);
+        searchRoot(A->right,B);
+    }
+    void dfs(TreeNode* A,TreeNode* B){
+        if(!A||!B||flag){
+            if(!A&&B||A&&!B){
+                flag=1;
+                ans=false;
+            }
+            return;
+        }
+        if(A->val==B->val){
+            dfs(A->left,B->left);
+            dfs(A->right,B->right);
+        }else{
+            ans=false;
+            flag=1;
+        }
+    }
+};
+3.正确的版本：
+class Solution {
+public:
+    bool isSubStructure(TreeNode* A, TreeNode* B) {
+        return (A && B) && (dfs(A, B) || isSubStructure(A->left, B) || isSubStructure(A->right, B));      //首先A和B全不能为空，并且dfs(A,B)返回真，或者树A的子树满足这个函数
+    }
+    bool dfs(TreeNode* A, TreeNode* B) {
+        if(!B) 
+          return true;
+        if(!A || A->val != B->val) 
+          return false;
+        return dfs(A->left, B->left) && dfs(A->right, B->right);
+    }
+};
