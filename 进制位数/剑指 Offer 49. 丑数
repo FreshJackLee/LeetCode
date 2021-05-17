@@ -1,1 +1,61 @@
-自己的代码：
+自己错误的代码：
+class Solution {
+public:
+    int nthUglyNumber(int n) {
+        vector<int> list;
+        if(n<=6){
+        	return n;
+		    }
+        int flag;
+        for(int i=8;;++i){
+            int j=2;
+            flag=0;
+            while(j<i){                           //第一次使用j<sqrt(i)
+                if(i%j==0&&!(j==2||j==3||j==5)){            //主力判断不是包含质因数2，3，5的数，这个思路是错误的！！！因为8=4*2
+                    break;                              //在这里会被排除，但是8是正确的这个思路是错误的！！！
+                }
+                if(i%j==0){
+                	flag=1;
+				} 
+                ++j;
+            }
+            if(j==i&&flag){
+                list.push_back(i);
+            }
+            if(list.size()==n-6){
+            	break;
+			}
+        }
+        for(auto e:list){
+        	cout<<e<<" ";
+		}
+		cout<<endl;
+        return list[n-7];
+    }
+};
+2.正确的做法：
+class Solution {
+public:
+    int nthUglyNumber(int n) {
+        vector<int> factors = {2, 3, 5};            //先填充前几个基础数值
+        unordered_set<long> seen;                   //用来去重的操作！
+        priority_queue<long, vector<long>, greater<long>> heap;       //优先队列，即默认的最小堆！！！
+        seen.insert(1L);                                          //后面加不加L，目前好像没有看到很大的区别
+        heap.push(1L);
+        int ugly = 0;
+        for (int i = 0; i < n; i++) {
+            long curr = heap.top();                 //作最小的基础，开始乘以2，3，5得到丑数
+            heap.pop();                         //注意要弹出
+            ugly = (int)curr;                   //同时要进行进制转换
+            for (int factor : factors) {
+                long next = curr * factor;
+                if (!seen.count(next)) {            //如果没有找到，说明没有重复，可以插入堆里，同时也可以插入set中，注意这个技巧
+                    seen.insert(next);                      //不要老直接insert来去重！！！！！
+                    heap.push(next);
+                                          //时间复杂度分析：第一层for为O(n),第二层为:O(log n)+O(log 3n),共计O(nlog n)
+                }                         //为什么第二层log n+log 3n呢？实际上，堆删除插入操作均为Log n，因此：
+            }                             //删除一个log n,然后插入三个log n+log n+log n=log 3n！！！
+        }
+        return ugly;
+    }
+};
