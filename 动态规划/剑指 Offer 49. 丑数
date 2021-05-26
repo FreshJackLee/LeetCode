@@ -1,0 +1,23 @@
+动态规划：                 //核心是丑数是从已存在的丑数然后乘以2，3，5以后得到另外的丑数，因此可以使用动态规划的方法求解
+class Solution {
+public:
+    int nthUglyNumber(int n) {
+        vector<int> dp(n + 1);
+        dp[1] = 1;
+        int p2 = 1, p3 = 1, p5 = 1;               //相当于质因数，也要增加
+        for (int i = 2; i <= n; i++) {
+            int num2 = dp[p2] * 2, num3 = dp[p3] * 3, num5 = dp[p5] * 5;
+            dp[i] = min(min(num2, num3), num5);
+            if (dp[i] == num2) {
+                p2++;
+            }
+            if (dp[i] == num3) {
+                p3++;
+            }
+            if (dp[i] == num5) {
+                p5++;
+            }
+        }
+        return dp[n];
+    }
+};
