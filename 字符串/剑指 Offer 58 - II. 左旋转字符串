@@ -7,3 +7,13 @@ public:
         return s;
     }
 };
+2.利用取余的操作：
+class Solution {
+public:
+    string reverseLeftWords(string s, int n) {
+        string res;
+        for(int i = n; i < n + s.size(); i++)
+            res += s[i % s.size()];                     //类似于取余循环队列
+        return res;
+    }
+};
